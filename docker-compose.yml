@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  backend-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:app_production_pass@fintech-db:5432/quantum_wealth
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-super_quantum_secure_secret_key_2026}
+    depends_on:
+      - fintech-db
+
+  fintech-db:
+    image: ankane/pgvector:latest  # Extends PostgreSQL with pre-compiled pgvector dependencies
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=app_production_pass
+      - POSTGRES_DB=quantum_wealth
+    volumes:
+      - pg_financial_data:/var/lib/postgresql/data
+
+volumes:
+  pg_financial_data:

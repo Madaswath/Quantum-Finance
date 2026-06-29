@@ -1,0 +1,1224 @@
+<div class="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-cyan-500/30 selection:text-cyan-300 relative">
+  <div class="mesh-gradient"></div>
+  <div class="mesh-gradient-2"></div>
+  
+  <!-- Main Header Navigation -->
+  <header class="border-b border-white/10 bg-slate-950/40 backdrop-blur-md sticky top-0 z-50 px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-3 relative z-10">
+      <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-cyan-400 to-violet-500 flex items-center justify-center shadow-md shadow-cyan-500/10">
+        <mat-icon class="text-slate-950 font-bold">query_stats</mat-icon>
+      </div>
+      <div>
+        <h1 class="text-xl font-bold font-display tracking-tight bg-gradient-to-r from-white via-slate-100 to-cyan-400 bg-clip-text text-transparent">QUANTUM FINANCE</h1>
+        <p class="text-xs text-slate-400">Private Ledger & AI Fiduciary Wealth Workspace</p>
+      </div>
+    </div>
+
+    <!-- Active Profile & Auth Status -->
+    <div class="flex items-center gap-4 relative z-10">
+      @if (user()) {
+        <div class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-full py-1.5 px-4 backdrop-blur-md">
+          <span class="h-2 w-2 rounded-full bg-cyan-400 animate-pulse"></span>
+          <span class="text-xs text-slate-300 font-mono font-medium">{{ user()?.email }}</span>
+          <button (click)="handleLogout()" class="text-xs text-slate-400 hover:text-rose-400 transition-colors flex items-center gap-1 ml-2 border-l border-white/10 pl-3">
+            <mat-icon class="text-xs scale-75">logout</mat-icon>
+            Sign Out
+          </button>
+        </div>
+      } @else {
+        <span class="text-xs text-slate-500 font-mono">Unauthenticated Demo Session</span>
+      }
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto p-6 space-y-8">
+    
+    <!-- Authentication Block (If not authenticated) -->
+    @if (!user()) {
+      <div class="max-w-md mx-auto my-12 glass-card rounded-2xl p-8 space-y-6 shadow-xl relative z-10">
+        <div class="text-center space-y-2">
+          <mat-icon class="text-cyan-400 scale-150">lock</mat-icon>
+          <h2 class="text-xl font-bold font-display text-white">Access Your Private Ledger</h2>
+          <p class="text-xs text-slate-400">Please authenticate to load your secure financial workspace.</p>
+        </div>
+
+        @if (authError()) {
+          <div class="bg-rose-500/10 border border-rose-500/20 rounded-xl p-3 text-xs text-rose-400 flex items-center gap-2">
+            <mat-icon class="text-sm">error</mat-icon>
+            <span>{{ authError() }}</span>
+          </div>
+        }
+
+        <div class="space-y-4">
+          <div class="space-y-1.5">
+            <label for="email" class="text-xs text-slate-400 font-medium">Email Address</label>
+            <input id="email" type="email" [(ngModel)]="emailInput" placeholder="you@domain.com" class="w-full glass-input rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50 transition-all font-mono" />
+          </div>
+
+          <div class="space-y-1.5">
+            <label for="password" class="text-xs text-slate-400 font-medium">Security Password</label>
+            <input id="password" type="password" [(ngModel)]="passwordInput" placeholder="••••••••" class="w-full glass-input rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50 transition-all font-mono" />
+          </div>
+
+          <div class="pt-2">
+            @if (authMode() === 'login') {
+              <button (click)="handleLogin()" [disabled]="isLoadingAuth()" class="w-full bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-semibold rounded-xl py-3 text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-cyan-400/15 disabled:opacity-50">
+                @if (isLoadingAuth()) {
+                  <span class="animate-spin border-2 border-slate-950 border-t-transparent rounded-full h-4 w-4"></span>
+                  Authenticating...
+                } @else {
+                  <mat-icon class="text-sm">login</mat-icon>
+                  Access Workspace
+                }
+              </button>
+            } @else {
+              <button (click)="handleRegister()" [disabled]="isLoadingAuth()" class="w-full bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-semibold rounded-xl py-3 text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-cyan-400/15 disabled:opacity-50">
+                @if (isLoadingAuth()) {
+                  <span class="animate-spin border-2 border-slate-950 border-t-transparent rounded-full h-4 w-4"></span>
+                  Creating Account...
+                } @else {
+                  <mat-icon class="text-sm">person_add</mat-icon>
+                  Create Secure Account
+                }
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="text-center pt-2">
+          <button (click)="toggleAuthMode()" class="text-xs text-slate-400 hover:text-cyan-400 transition-colors">
+            {{ authMode() === 'login' ? "Don't have an account? Sign Up" : "Already registered? Sign In" }}
+          </button>
+        </div>
+
+        <div class="border-t border-white/10 pt-4 text-center">
+          <button (click)="autoSignInDemo()" class="text-xs bg-white/5 border border-white/10 rounded-lg py-2 px-4 hover:border-cyan-500/30 text-cyan-400 transition-all backdrop-blur-md">
+            ⚡ Quick-Launch Demo Profile (Seeded MAY/JUNE Ledger)
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Main Workspace (Authenticated View) -->
+    @if (user()) {
+      
+      <!-- Tab Navigation -->
+      <div class="flex flex-wrap items-center gap-2 border-b border-white/10 pb-4 mb-4 relative z-10">
+        <button (click)="activeTab.set('ledger')" 
+                [class]="'flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono tracking-wider uppercase border border-white/5 transition-all cursor-pointer ' + (activeTab() === 'ledger' ? 'bg-cyan-400 text-slate-950 font-bold shadow-md shadow-cyan-400/15' : 'bg-white/5 text-slate-400 hover:text-white')" 
+                id="tab-ledger">
+          <mat-icon class="scale-75">dashboard</mat-icon>
+          Ledger
+        </button>
+        <button (click)="activeTab.set('goals')" 
+                [class]="'flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono tracking-wider uppercase border border-white/5 transition-all cursor-pointer ' + (activeTab() === 'goals' ? 'bg-cyan-400 text-slate-950 font-bold shadow-md shadow-cyan-400/15' : 'bg-white/5 text-slate-400 hover:text-white')" 
+                id="tab-goals">
+          <mat-icon class="scale-75">flag</mat-icon>
+          Goals & Milestones
+        </button>
+        <button (click)="activeTab.set('diagnostics')" 
+                [class]="'flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono tracking-wider uppercase border border-white/5 transition-all cursor-pointer ' + (activeTab() === 'diagnostics' ? 'bg-cyan-400 text-slate-950 font-bold shadow-md shadow-cyan-400/15' : 'bg-white/5 text-slate-400 hover:text-white')" 
+                id="tab-diagnostics">
+          <mat-icon class="scale-75">psychology</mat-icon>
+          AI Diagnostics
+        </button>
+        <button (click)="activeTab.set('preferences')" 
+                [class]="'flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono tracking-wider uppercase border border-white/5 transition-all cursor-pointer ' + (activeTab() === 'preferences' ? 'bg-cyan-400 text-slate-950 font-bold shadow-md shadow-cyan-400/15' : 'bg-white/5 text-slate-400 hover:text-white')" 
+                id="tab-preferences">
+          <mat-icon class="scale-75">manage_accounts</mat-icon>
+          Profile & Rules
+        </button>
+      </div>
+
+      @if (activeTab() === 'ledger') {
+      
+        <!-- Top Layer Analytical Metrics Dashboard -->
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+        
+        <!-- Net Worth Card -->
+        <div class="glass-card rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between shadow-sm hover:border-cyan-400/30 transition-all group">
+          <div class="absolute -right-4 -top-4 text-cyan-400/5 scale-[3] pointer-events-none group-hover:scale-[3.3] transition-all">
+            <mat-icon class="text-[64px]">account_balance</mat-icon>
+          </div>
+          <div class="space-y-1">
+            <span class="text-xs font-mono tracking-wider text-slate-400 uppercase">DYNAMIC NET WORTH</span>
+            <div class="text-3xl font-bold font-display text-white tracking-tight leading-none pt-1">
+              ₹{{ calculatedNetWorth() | number:'1.0-2' }}
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between text-xs text-slate-400 border-t border-white/10 pt-3">
+            <span class="flex items-center gap-1 text-cyan-400">
+              <mat-icon class="text-xs">trending_up</mat-icon>
+              Fiduciary Private Vault
+            </span>
+            <span class="font-mono text-slate-500">6% Inflation Factored</span>
+          </div>
+        </div>
+ 
+        <!-- Savings Pool Card -->
+        <div class="glass-card rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between shadow-sm hover:border-cyan-400/30 transition-all group">
+          <div class="absolute -right-4 -top-4 text-cyan-400/5 scale-[3] pointer-events-none group-hover:scale-[3.3] transition-all">
+            <mat-icon class="text-[64px]">savings</mat-icon>
+          </div>
+          <div class="space-y-1">
+            <span class="text-xs font-mono tracking-wider text-slate-400 uppercase">LIQUID SAVINGS POOLS</span>
+            <div class="text-3xl font-bold font-display text-cyan-400 tracking-tight leading-none pt-1">
+              ₹{{ calculatedSavingsPool() | number:'1.0-2' }}
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between text-xs text-slate-400 border-t border-white/10 pt-3">
+            <span class="flex items-center gap-1 font-mono text-slate-400">
+              Incomes: +₹{{ totalIncomes() | number }}
+            </span>
+            <span class="font-mono text-slate-500">ICICI / Cash</span>
+          </div>
+        </div>
+ 
+        <!-- Credit Liabilities Card -->
+        <div class="glass-card rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between shadow-sm hover:border-rose-500/30 transition-all group">
+          <div class="absolute -right-4 -top-4 text-rose-500/5 scale-[3] pointer-events-none group-hover:scale-[3.3] transition-all">
+            <mat-icon class="text-[64px]">credit_card</mat-icon>
+          </div>
+          <div class="space-y-1">
+            <span class="text-xs font-mono tracking-wider text-slate-400 uppercase">ACTIVE CREDIT LIABILITIES</span>
+            <div class="text-3xl font-bold font-display text-rose-400 tracking-tight leading-none pt-1">
+              ₹{{ calculatedLiabilityPool() | number:'1.0-2' }}
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-between text-xs text-slate-400 border-t border-white/10 pt-3">
+            <span class="flex items-center gap-1 text-rose-400 font-mono">
+              Expenses: -₹{{ totalExpenses() | number }}
+            </span>
+            <span class="font-mono text-slate-500">HDFC Card Outstanding</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Account Balances Sub-Row -->
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+        <div class="glass-card rounded-2xl p-4 flex items-center justify-between border-white/5">
+          <span class="text-xs font-mono tracking-wider text-slate-400 flex items-center gap-2">
+            <mat-icon class="text-emerald-400 scale-95">payments</mat-icon>
+            💵 CASH BALANCE
+          </span>
+          <span [class]="'text-sm font-bold font-mono ' + (cashBalance() >= 0 ? 'text-emerald-400' : 'text-rose-400')">
+            ₹{{ cashBalance() | number:'1.0-0' }}
+          </span>
+        </div>
+        <div class="glass-card rounded-2xl p-4 flex items-center justify-between border-white/5">
+          <span class="text-xs font-mono tracking-wider text-slate-400 flex items-center gap-2">
+            <mat-icon class="text-cyan-400 scale-95">account_balance</mat-icon>
+            🏛️ ICICI BANK
+          </span>
+          <span [class]="'text-sm font-bold font-mono ' + (iciciBalance() >= 0 ? 'text-emerald-400' : 'text-rose-400')">
+            ₹{{ iciciBalance() | number:'1.0-0' }}
+          </span>
+        </div>
+        <div class="glass-card rounded-2xl p-4 flex items-center justify-between border-white/5">
+          <span class="text-xs font-mono tracking-wider text-slate-400 flex items-center gap-2">
+            <mat-icon class="text-rose-400 scale-95">credit_score</mat-icon>
+            💳 HDFC CARD
+          </span>
+          <span [class]="'text-sm font-bold font-mono ' + (hdfcBalance() >= 0 ? 'text-emerald-400' : 'text-rose-400')">
+            ₹{{ hdfcBalance() | number:'1.0-0' }}
+          </span>
+        </div>
+      </section>
+
+      <!-- Primary Layout Division (2 Columns) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Left Column: Transactions Ledger & SMS Parsers (Sized 7/12) -->
+        <div class="lg:col-span-7 space-y-8">
+          
+          <!-- Ledger Block -->
+          <section class="glass-card rounded-2xl p-6 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="space-y-1">
+                <h3 class="text-lg font-bold font-display text-white flex items-center gap-2">
+                  <mat-icon class="text-cyan-400">list_alt</mat-icon>
+                  Transactional Daily Ledger
+                </h3>
+                <p class="text-xs text-slate-400">Track and filter private ledger transactions</p>
+              </div>
+
+              <!-- Quick Filtering -->
+              <div class="flex flex-wrap items-center gap-2">
+                <select [ngModel]="filterAccount()" (ngModelChange)="filterAccount.set($event)" class="glass-input rounded-lg text-xs py-1.5 px-3 text-slate-300 focus:outline-none">
+                  <option value="All">All Accounts</option>
+                  <option value="Cash">Cash Only</option>
+                  <option value="HDFC Card">HDFC Card</option>
+                  <option value="ICICI">ICICI</option>
+                </select>
+
+                <select [ngModel]="filterCategory()" (ngModelChange)="filterCategory.set($event)" class="glass-input rounded-lg text-xs py-1.5 px-3 text-slate-300 focus:outline-none">
+                  <option value="All">All Categories</option>
+                  <option value="🍜 Food">🍜 Food</option>
+                  <option value="🪑 Household">🪑 Household</option>
+                  <option value="🧘🏼 Health">🧘🏼 Health</option>
+                  <option value="🚗 Transport">🚗 Transport</option>
+                  <option value="📈 Investment">📈 Investment</option>
+                  <option value="💼 Income">💼 Income</option>
+                  <option value="🎓 Education">🎓 Education</option>
+                  <option value="🎉 Entertainment">🎉 Entertainment</option>
+                  <option value="🎁 Gift">🎁 Gift</option>
+                </select>
+
+                <button (click)="exportFilteredToCSV()" 
+                        class="flex items-center gap-1.5 bg-gradient-to-r from-cyan-400 to-teal-400 hover:from-cyan-300 hover:to-teal-300 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs font-mono tracking-wider cursor-pointer transition-all shadow-md shadow-cyan-400/10">
+                  <mat-icon class="scale-75 text-sm font-bold">download</mat-icon>
+                  <span>EXPORT CSV</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Sub-tab pills -->
+            <div class="flex items-center gap-1.5 p-1 bg-white/5 border border-white/5 rounded-xl w-fit">
+              <button (click)="ledgerSubTab.set('daily')" [class]="'px-3.5 py-1.5 rounded-lg text-[11px] font-mono tracking-wide transition-all cursor-pointer ' + (ledgerSubTab() === 'daily' ? 'bg-cyan-400 text-slate-950 font-bold shadow-md shadow-cyan-400/15' : 'text-slate-400 hover:text-white')">
+                Daily
+              </button>
+              <button (click)="ledgerSubTab.set('weekly')" [class]="'px-3.5 py-1.5 rounded-lg text-[11px] font-mono tracking-wide transition-all cursor-pointer ' + (ledgerSubTab() === 'weekly' ? 'bg-cyan-400 text-slate-950 font-bold shadow-md shadow-cyan-400/15' : 'text-slate-400 hover:text-white')">
+                Weekly
+              </button>
+              <button (click)="ledgerSubTab.set('monthly')" [class]="'px-3.5 py-1.5 rounded-lg text-[11px] font-mono tracking-wide transition-all cursor-pointer ' + (ledgerSubTab() === 'monthly' ? 'bg-cyan-400 text-slate-950 font-bold shadow-md shadow-cyan-400/15' : 'text-slate-400 hover:text-white')">
+                Monthly
+              </button>
+              <button (click)="ledgerSubTab.set('summary')" [class]="'px-3.5 py-1.5 rounded-lg text-[11px] font-mono tracking-wide transition-all cursor-pointer ' + (ledgerSubTab() === 'summary' ? 'bg-cyan-400 text-slate-950 font-bold shadow-md shadow-cyan-400/15' : 'text-slate-400 hover:text-white')">
+                Budget Summary
+              </button>
+            </div>
+
+            <!-- Transactions Rows based on Active Sub-tab -->
+            <div class="space-y-4 max-h-[460px] overflow-y-auto pr-2 custom-scrollbar">
+              @if (isLoadingTransactions()) {
+                <div class="text-center py-12 space-y-3">
+                  <span class="animate-spin border-2 border-cyan-400 border-t-transparent rounded-full h-8 w-8 inline-block"></span>
+                  <p class="text-xs text-slate-500">Syncing database assets...</p>
+                </div>
+              } @else {
+                <!-- DAILY SUB-TAB -->
+                @if (ledgerSubTab() === 'daily') {
+                  @if (groupedDailyTransactions().length === 0) {
+                    <div class="text-center py-12 text-slate-500 space-y-2 border border-dashed border-white/10 rounded-xl">
+                      <mat-icon class="text-slate-700">calendar_today</mat-icon>
+                      <p class="text-xs">No transactions logged for this period.</p>
+                    </div>
+                  } @else {
+                    @for (group of groupedDailyTransactions(); track group.date) {
+                      <div class="space-y-1.5">
+                        <div class="flex items-center justify-between text-[10px] text-slate-400 font-mono px-1">
+                          <span>{{ group.date | date:'EEEE, dd MMM yyyy' }}</span>
+                          <div class="flex gap-2">
+                            @if (group.income > 0) { <span class="text-emerald-400 font-semibold">+₹{{ group.income | number }}</span> }
+                            @if (group.expense > 0) { <span class="text-rose-400 font-semibold">-₹{{ group.expense | number }}</span> }
+                          </div>
+                        </div>
+                        <div class="space-y-2">
+                          @for (tx of group.txs; track tx.id) {
+                            <div class="glass-row rounded-xl p-2.5 sm:p-3.5 flex items-center justify-between gap-2.5 sm:gap-4 transition-all duration-200 hover:border-cyan-400/30">
+                              <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                                <div class="h-8 w-8 sm:h-9 sm:w-9 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-sm sm:text-base select-none shrink-0">
+                                  {{ tx.category.substring(0, 2) }}
+                                </div>
+                                <div class="space-y-0.5 min-w-0">
+                                  <div class="text-[11px] sm:text-xs font-semibold text-white flex items-center gap-1 sm:gap-1.5 leading-tight truncate">
+                                    <span>{{ tx.note }}</span>
+                                    @if (tx.receiptImage) {
+                                      <button (click)="receiptPreviewModal.set(tx.receiptImage)" class="text-cyan-400 hover:text-cyan-300 flex items-center scale-90 cursor-pointer">
+                                        <mat-icon class="text-xs sm:text-sm">photo_camera</mat-icon>
+                                      </button>
+                                    }
+                                  </div>
+                                  <div class="flex flex-wrap items-center gap-1 sm:gap-1.5 text-[8px] sm:text-[9px]">
+                                    <span class="text-slate-400 truncate">{{ tx.subcategory }}</span>
+                                    <span class="h-1 w-1 rounded-full bg-slate-700"></span>
+                                    <span class="px-1.5 py-0.2 bg-white/5 border border-white/10 text-slate-400 rounded font-mono">{{ tx.accountSource }}</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+                                <div class="text-right space-y-0.5">
+                                  <div class="text-[11px] sm:text-xs font-bold font-mono" [ngClass]="tx.flowDirection === 'Income' ? 'text-cyan-400' : tx.flowDirection === 'Transfer' ? 'text-violet-400' : 'text-slate-200'">
+                                    {{ tx.flowDirection === 'Income' ? '+' : tx.flowDirection === 'Transfer' ? '⇄' : '-' }}₹{{ tx.amount | number }}
+                                  </div>
+                                  <div class="text-[7px] sm:text-[8px] font-mono text-slate-500 uppercase">{{ tx.flowDirection }}</div>
+                                </div>
+                                <button (click)="deleteTransaction(tx.id)" class="h-6 w-6 sm:h-7 sm:w-7 rounded-md sm:rounded-lg bg-white/5 border border-white/10 hover:bg-rose-500/10 hover:border-rose-500/20 text-slate-400 hover:text-rose-400 flex items-center justify-center transition-all cursor-pointer">
+                                  <mat-icon class="text-xs scale-75">delete_outline</mat-icon>
+                                </button>
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    }
+                  }
+                }
+
+                <!-- WEEKLY SUB-TAB -->
+                @if (ledgerSubTab() === 'weekly') {
+                  @if (groupedWeeklyTransactions().length === 0) {
+                    <div class="text-center py-12 text-slate-500 space-y-2 border border-dashed border-white/10 rounded-xl">
+                      <mat-icon class="text-slate-700">date_range</mat-icon>
+                      <p class="text-xs">No transactions logged for this period.</p>
+                    </div>
+                  } @else {
+                    @for (group of groupedWeeklyTransactions(); track group.weekLabel) {
+                      <div class="space-y-1.5">
+                        <div class="flex items-center justify-between text-[10px] text-slate-400 font-mono px-1">
+                          <span>{{ group.weekLabel }}</span>
+                          <div class="flex gap-2">
+                            @if (group.income > 0) { <span class="text-emerald-400 font-semibold">+₹{{ group.income | number }}</span> }
+                            @if (group.expense > 0) { <span class="text-rose-400 font-semibold">-₹{{ group.expense | number }}</span> }
+                          </div>
+                        </div>
+                        <div class="space-y-2">
+                          @for (tx of group.txs; track tx.id) {
+                            <div class="glass-row rounded-xl p-2.5 sm:p-3.5 flex items-center justify-between gap-2.5 sm:gap-4 transition-all duration-200 hover:border-cyan-400/30">
+                              <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                                <div class="h-8 w-8 sm:h-9 sm:w-9 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-sm sm:text-base select-none shrink-0">
+                                  {{ tx.category.substring(0, 2) }}
+                                </div>
+                                <div class="space-y-0.5 min-w-0">
+                                  <div class="text-[11px] sm:text-xs font-semibold text-white flex items-center gap-1 sm:gap-1.5 leading-tight truncate">
+                                    <span>{{ tx.note }}</span>
+                                    @if (tx.receiptImage) {
+                                      <button (click)="receiptPreviewModal.set(tx.receiptImage)" class="text-cyan-400 hover:text-cyan-300 flex items-center scale-90 cursor-pointer">
+                                        <mat-icon class="text-xs sm:text-sm">photo_camera</mat-icon>
+                                      </button>
+                                    }
+                                  </div>
+                                  <div class="flex flex-wrap items-center gap-1 sm:gap-1.5 text-[8px] sm:text-[9px]">
+                                    <span class="text-slate-400 font-mono">{{ tx.period | date:'dd MMM' }}</span>
+                                    <span class="h-1 w-1 rounded-full bg-slate-700"></span>
+                                    <span class="text-slate-400 truncate">{{ tx.subcategory }}</span>
+                                    <span class="h-1 w-1 rounded-full bg-slate-700"></span>
+                                    <span class="px-1.5 py-0.2 bg-white/5 border border-white/10 text-slate-400 rounded font-mono">{{ tx.accountSource }}</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+                                <div class="text-right space-y-0.5">
+                                  <div class="text-[11px] sm:text-xs font-bold font-mono" [ngClass]="tx.flowDirection === 'Income' ? 'text-cyan-400' : tx.flowDirection === 'Transfer' ? 'text-violet-400' : 'text-slate-200'">
+                                    {{ tx.flowDirection === 'Income' ? '+' : tx.flowDirection === 'Transfer' ? '⇄' : '-' }}₹{{ tx.amount | number }}
+                                  </div>
+                                  <div class="text-[7px] sm:text-[8px] font-mono text-slate-500 uppercase">{{ tx.flowDirection }}</div>
+                                </div>
+                                <button (click)="deleteTransaction(tx.id)" class="h-6 w-6 sm:h-7 sm:w-7 rounded-md sm:rounded-lg bg-white/5 border border-white/10 hover:bg-rose-500/10 hover:border-rose-500/20 text-slate-400 hover:text-rose-400 flex items-center justify-center transition-all cursor-pointer">
+                                  <mat-icon class="text-xs scale-75">delete_outline</mat-icon>
+                                </button>
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    }
+                  }
+                }
+
+                <!-- MONTHLY SUB-TAB -->
+                @if (ledgerSubTab() === 'monthly') {
+                  @if (groupedMonthlyTransactions().length === 0) {
+                    <div class="text-center py-12 text-slate-500 space-y-2 border border-dashed border-white/10 rounded-xl">
+                      <mat-icon class="text-slate-700">calendar_month</mat-icon>
+                      <p class="text-xs">No transactions logged for this period.</p>
+                    </div>
+                  } @else {
+                    @for (group of groupedMonthlyTransactions(); track group.monthLabel) {
+                      <div class="space-y-1.5">
+                        <div class="flex items-center justify-between text-[10px] text-slate-400 font-mono px-1">
+                          <span>{{ group.monthLabel }}</span>
+                          <div class="flex gap-2">
+                            @if (group.income > 0) { <span class="text-emerald-400 font-semibold">+₹{{ group.income | number }}</span> }
+                            @if (group.expense > 0) { <span class="text-rose-400 font-semibold">-₹{{ group.expense | number }}</span> }
+                          </div>
+                        </div>
+                        <div class="space-y-2">
+                          @for (tx of group.txs; track tx.id) {
+                            <div class="glass-row rounded-xl p-2.5 sm:p-3.5 flex items-center justify-between gap-2.5 sm:gap-4 transition-all duration-200 hover:border-cyan-400/30">
+                              <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+                                <div class="h-8 w-8 sm:h-9 sm:w-9 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-sm sm:text-base select-none shrink-0">
+                                  {{ tx.category.substring(0, 2) }}
+                                </div>
+                                <div class="space-y-0.5 min-w-0">
+                                  <div class="text-[11px] sm:text-xs font-semibold text-white flex items-center gap-1 sm:gap-1.5 leading-tight truncate">
+                                    <span>{{ tx.note }}</span>
+                                    @if (tx.receiptImage) {
+                                      <button (click)="receiptPreviewModal.set(tx.receiptImage)" class="text-cyan-400 hover:text-cyan-300 flex items-center scale-90 cursor-pointer">
+                                        <mat-icon class="text-xs sm:text-sm">photo_camera</mat-icon>
+                                      </button>
+                                    }
+                                  </div>
+                                  <div class="flex flex-wrap items-center gap-1 sm:gap-1.5 text-[8px] sm:text-[9px]">
+                                    <span class="text-slate-400 font-mono">{{ tx.period | date:'dd MMM' }}</span>
+                                    <span class="h-1 w-1 rounded-full bg-slate-700"></span>
+                                    <span class="text-slate-400 truncate">{{ tx.subcategory }}</span>
+                                    <span class="h-1 w-1 rounded-full bg-slate-700"></span>
+                                    <span class="px-1.5 py-0.2 bg-white/5 border border-white/10 text-slate-400 rounded font-mono">{{ tx.accountSource }}</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+                                <div class="text-right space-y-0.5">
+                                  <div class="text-[11px] sm:text-xs font-bold font-mono" [ngClass]="tx.flowDirection === 'Income' ? 'text-cyan-400' : tx.flowDirection === 'Transfer' ? 'text-violet-400' : 'text-slate-200'">
+                                    {{ tx.flowDirection === 'Income' ? '+' : tx.flowDirection === 'Transfer' ? '⇄' : '-' }}₹{{ tx.amount | number }}
+                                  </div>
+                                  <div class="text-[7px] sm:text-[8px] font-mono text-slate-500 uppercase">{{ tx.flowDirection }}</div>
+                                </div>
+                                <button (click)="deleteTransaction(tx.id)" class="h-6 w-6 sm:h-7 sm:w-7 rounded-md sm:rounded-lg bg-white/5 border border-white/10 hover:bg-rose-500/10 hover:border-rose-500/20 text-slate-400 hover:text-rose-400 flex items-center justify-center transition-all cursor-pointer">
+                                  <mat-icon class="text-xs scale-75">delete_outline</mat-icon>
+                                </button>
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    }
+                  }
+                }
+
+                <!-- BUDGET SUMMARY OVERVIEW -->
+                @if (ledgerSubTab() === 'summary') {
+                  @if (summaryMetrics().length === 0) {
+                    <div class="text-center py-12 text-slate-500 space-y-2 border border-dashed border-white/10 rounded-xl">
+                      <mat-icon class="text-slate-700">query_stats</mat-icon>
+                      <p class="text-xs">No expenditure transactions recorded yet to build budget summary.</p>
+                    </div>
+                  } @else {
+                    <div class="space-y-6">
+                      <div class="bg-white/5 border border-white/10 rounded-xl p-4">
+                        <h4 class="text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wider text-center">Category Breakdown</h4>
+                        <app-donut-chart [data]="categoryBurnRates()"></app-donut-chart>
+                      </div>
+
+                      <div class="space-y-4">
+                        @for (item of summaryMetrics(); track item.category) {
+                        <div class="bg-white/5 border border-white/10 rounded-xl p-4 space-y-2.5">
+                          <div class="flex items-center justify-between text-xs">
+                            <div class="flex items-center gap-2 font-semibold text-white">
+                              <span class="text-base">{{ item.category }}</span>
+                            </div>
+                            <div class="text-right font-mono text-xs">
+                              <span class="text-white font-bold">₹{{ item.amount | number:'1.0-0' }}</span>
+                              <span class="text-slate-500"> / ₹{{ item.budget | number:'1.0-0' }}</span>
+                            </div>
+                          </div>
+
+                          <!-- Budget Progress Bar -->
+                          <div class="space-y-1.5">
+                            <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-white/5">
+                              <div [class]="'h-full rounded-full transition-all duration-300 ' + 
+                                (item.budgetUtil >= 100 ? 'bg-rose-500 shadow-sm shadow-rose-500/20' : 
+                                 item.budgetUtil >= 80 ? 'bg-amber-500 shadow-sm shadow-amber-500/20' : 
+                                 'bg-cyan-400 shadow-sm shadow-cyan-400/20')"
+                                   [style.width.%]="item.budgetUtil > 100 ? 100 : item.budgetUtil"></div>
+                            </div>
+                            <div class="flex items-center justify-between text-[10px] font-mono">
+                              <span class="text-slate-500">{{ item.pctOfTotal | number:'1.0-1' }}% of total spend</span>
+                              <span [class]="item.budgetUtil >= 100 ? 'text-rose-400 font-bold' : item.budgetUtil >= 80 ? 'text-amber-400' : 'text-slate-400'">
+                                {{ item.budgetUtil | number:'1.0-1' }}% utilized
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                  }
+                }
+              }
+            </div>
+          </section>
+
+          <!-- SMS Parser & Manual Builder Box (Moved to Right Column) -->
+        </div>
+
+        <!-- Right Column: Widgets & Dashboard (Sized 5/12) -->
+        <div class="lg:col-span-5 flex flex-col gap-8 relative z-10">
+          
+          <!-- Regex SMS Parser Widget -->
+          <div class="glass-card rounded-2xl p-6 space-y-4">
+              <div class="space-y-1">
+                <h4 class="text-sm font-bold font-display text-white flex items-center gap-2">
+                  <mat-icon class="text-cyan-400">speaker_notes</mat-icon>
+                  Regex Banking SMS Parser
+                </h4>
+                <p class="text-[11px] text-slate-400">Pasted SMS strings are parsed instantly on the backend</p>
+              </div>
+
+              <!-- SMS Input Textarea -->
+              <div class="space-y-3">
+                <textarea id="sms-raw-text" [(ngModel)]="smsText" placeholder="Paste banking transaction alert text here..." rows="3" class="w-full glass-input rounded-xl p-3 text-xs text-white placeholder:text-slate-600 font-sans"></textarea>
+                
+                <button (click)="handleParseSMS()" [disabled]="isParsingSMS() || !smsText().trim()" class="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-cyan-400 font-semibold rounded-xl py-2 text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 backdrop-blur-md">
+                  @if (isParsingSMS()) {
+                    <span class="animate-spin border-2 border-cyan-400 border-t-transparent rounded-full h-3 w-3"></span>
+                    Analyzing regex pattern...
+                  } @else {
+                    <mat-icon class="text-sm">auto_awesome</mat-icon>
+                    Parse SMS Pattern
+                  }
+                </button>
+              </div>
+
+              <!-- Demo Preset Chips -->
+              <div class="space-y-2">
+                <span class="text-[10px] text-slate-500 font-mono">CHOOSE DEMO BANKING PRESETS:</span>
+                <div class="flex flex-col gap-1.5">
+                  @for (preset of smsPresets; track $index) {
+                    <button (click)="applyPreset(preset.text)" class="text-left text-[10px] bg-white/5 border border-white/10 hover:border-cyan-400/30 text-slate-300 hover:text-white rounded-lg p-2 transition-all block font-mono truncate cursor-pointer backdrop-blur-md">
+                      {{ preset.label }}
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- Manual Transaction Builder -->
+            <div class="glass-card rounded-2xl p-6 space-y-4">
+              <div class="space-y-1">
+                <h4 class="text-sm font-bold font-display text-white flex items-center gap-2">
+                  <mat-icon class="text-cyan-400">add_circle_outline</mat-icon>
+                  Transaction Record Builder
+                </h4>
+                <p class="text-[11px] text-slate-400">Confirmed dimensions are recorded to the database</p>
+              </div>
+
+              @if (ledgerError()) {
+                <div class="bg-rose-500/10 border border-rose-500/20 rounded-lg p-2 text-[10px] text-rose-400">
+                  {{ ledgerError() }}
+                </div>
+              }
+
+              <div class="space-y-3 text-xs">
+                <!-- Two column fields -->
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="space-y-1">
+                    <label for="tx-date" class="text-slate-400 text-[10px] uppercase font-mono">Date</label>
+                    <input id="tx-date" type="date" [(ngModel)]="txDate" class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none" />
+                  </div>
+                  <div class="space-y-1">
+                    <label for="tx-flow" class="text-slate-400 text-[10px] uppercase font-mono">Flow</label>
+                    <select id="tx-flow" [(ngModel)]="txFlow" class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none">
+                      <option value="Exp.">Exp (Debit)</option>
+                      <option value="Income">Income (Credit)</option>
+                      <option value="Transfer">Transfer (Double-Entry)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="space-y-1">
+                    <label for="tx-account" class="text-slate-400 text-[10px] uppercase font-mono">
+                      @if (txFlow() === 'Transfer') { Source Account } @else { Institution }
+                    </label>
+                    <select id="tx-account" [(ngModel)]="txAccount" class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none">
+                      <option value="HDFC Card">HDFC Card</option>
+                      <option value="ICICI">ICICI</option>
+                      <option value="Cash">Cash</option>
+                    </select>
+                  </div>
+                  <div class="space-y-1">
+                    @if (txFlow() === 'Transfer') {
+                      <label for="tx-transfer-to" class="text-slate-400 text-[10px] uppercase font-mono">Destination Account</label>
+                      <select id="tx-transfer-to" [(ngModel)]="txTransferTo" class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none">
+                        <option value="HDFC Card">HDFC Card</option>
+                        <option value="ICICI">ICICI</option>
+                        <option value="Cash">Cash</option>
+                      </select>
+                    } @else {
+                      <label for="tx-category" class="text-slate-400 text-[10px] uppercase font-mono">Category</label>
+                      <select id="tx-category" [(ngModel)]="txCategory" class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none">
+                        <option value="🍜 Food">🍜 Food</option>
+                        <option value="🪑 Household">🪑 Household</option>
+                        <option value="🧘🏼 Health">🧘🏼 Health</option>
+                        <option value="🚗 Transport">🚗 Transport</option>
+                        <option value="🎓 Education">🎓 Education</option>
+                        <option value="📈 Investment">📈 Investment</option>
+                        <option value="🎁 Gift">🎁 Gift</option>
+                        <option value="🎉 Entertainment">🎉 Entertainment</option>
+                        <option value="💼 Income">💼 Income</option>
+                      </select>
+                    }
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="space-y-1">
+                    <label for="tx-sub" class="text-slate-400 text-[10px] uppercase font-mono">Subcategory</label>
+                    <input id="tx-sub" type="text" [(ngModel)]="txSubcategory" [disabled]="txFlow() === 'Transfer'" [placeholder]="txFlow() === 'Transfer' ? 'Auto-filled' : 'Snacks, rent, BP...'" class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none disabled:opacity-50" />
+                  </div>
+                  <div class="space-y-1">
+                    <label for="tx-amt" class="text-slate-400 text-[10px] uppercase font-mono">Amount (INR)</label>
+                    <input id="tx-amt" type="number" [(ngModel)]="txAmount" placeholder="₹ Amount" class="w-full glass-input text-cyan-400 font-mono rounded-lg p-2 text-xs focus:outline-none" />
+                  </div>
+                </div>
+
+                <div class="space-y-1">
+                  <label for="tx-note" class="text-slate-400 text-[10px] uppercase font-mono">Merchant / Transfer Note</label>
+                  <input id="tx-note" type="text" [(ngModel)]="txNote" [placeholder]="txFlow() === 'Transfer' ? 'Optional description' : 'Chai Kings, Apollo pharmacy...'" class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none" />
+                </div>
+
+                <!-- Photo Receipt Upload -->
+                @if (txFlow() !== 'Transfer') {
+                  <div class="space-y-1.5 pt-1">
+                    <span class="text-slate-400 text-[10px] uppercase font-mono block">Attach Photo Receipt (Drag-and-Drop / Browse)</span>
+                    <div class="flex items-center gap-3">
+                      <label for="receipt-file-input" class="flex-1 flex items-center justify-center gap-1.5 bg-white/5 border border-white/10 hover:border-cyan-500/30 text-slate-300 hover:text-white rounded-lg py-2 px-3 text-xs transition-all cursor-pointer select-none">
+                        <mat-icon class="text-sm scale-90">photo_camera</mat-icon>
+                        <span>{{ txReceiptImage() ? 'Receipt Attached ✓' : 'Upload Receipt' }}</span>
+                      </label>
+                      <input id="receipt-file-input" type="file" (change)="onReceiptFileChange($event)" accept="image/*" class="hidden" />
+                      @if (txReceiptImage()) {
+                        <div class="h-8 w-8 rounded bg-white/10 border border-white/10 overflow-hidden relative group shrink-0">
+                          <img [src]="txReceiptImage()" alt="Receipt preview thumbnail" class="h-full w-full object-cover" />
+                          <button (click)="txReceiptImage.set('')" class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-rose-400 transition-opacity cursor-pointer">
+                            <mat-icon class="text-xs scale-75">delete</mat-icon>
+                          </button>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+
+                <button (click)="addManualTransaction()" class="w-full bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-bold rounded-xl py-2.5 text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-cyan-400/10">
+                  <mat-icon class="text-xs scale-75">save</mat-icon>
+                  Record to Database
+                </button>
+              </div>
+            </div>
+
+
+        </div>
+      </div>
+      } @else if (activeTab() === 'goals') {
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
+          <div class="lg:col-span-8 lg:col-start-3 space-y-6">
+            <!-- Financial Milestones Targets -->
+          <section class="glass-card rounded-2xl p-6 space-y-4">
+            <div class="space-y-1">
+              <h3 class="text-base font-bold font-display text-white flex items-center gap-2">
+                <mat-icon class="text-cyan-400">flag</mat-icon>
+                Milestone Fiduciary Milestones
+              </h3>
+              <p class="text-xs text-slate-400">Define milestone goals for forward-looking AI projection analysis</p>
+            </div>
+
+            <!-- Milestones List -->
+            <div class="space-y-2.5 max-h-[170px] overflow-y-auto pr-1">
+              @for (m of milestones(); track $index) {
+                <div class="bg-white/5 border border-white/10 rounded-xl p-3 flex items-center justify-between gap-4">
+                  <div class="space-y-0.5">
+                    <div class="text-xs font-bold text-white">{{ m.target }}</div>
+                    <div class="text-[10px] text-slate-400">Target timeline: <span class="text-cyan-400 font-mono">{{ m.timeline }}</span></div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold font-mono text-cyan-400 bg-cyan-500/5 px-2.5 py-1 rounded-lg border border-cyan-500/10">₹{{ m.amount | number }}</span>
+                    <button (click)="removeMilestone($index)" class="text-slate-500 hover:text-rose-400 transition-colors h-7 w-7 flex items-center justify-center rounded-lg border border-white/10 hover:border-rose-500/20 hover:bg-rose-500/10 cursor-pointer">
+                      <mat-icon class="text-xs scale-75">close</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <!-- Milestone Add Form -->
+            <div class="border-t border-white/10 pt-4 space-y-3">
+              <span class="text-[10px] text-slate-500 font-mono block">ADD CUSTOM GOAL TARGET:</span>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <input id="new-goal-target" type="text" [(ngModel)]="newMilestoneTarget" placeholder="e.g. 🏡 House downpayment" class="glass-input rounded-lg p-2 text-slate-200" />
+                <input id="new-goal-amt" type="number" [(ngModel)]="newMilestoneAmount" placeholder="Target ₹ (INR)" class="glass-input rounded-lg p-2 text-slate-200 font-mono" />
+              </div>
+              <div class="flex items-center gap-2">
+                <input id="new-goal-time" type="text" [(ngModel)]="newMilestoneTimeline" placeholder="Timeline (e.g. Dec 2028)" class="flex-1 glass-input rounded-lg p-2 text-xs text-slate-200" />
+                <button (click)="addMilestone()" [disabled]="!newMilestoneTarget() || !newMilestoneAmount()" class="bg-white/5 hover:bg-white/10 border border-white/10 text-cyan-400 px-4 py-2 rounded-lg text-xs font-bold transition-all disabled:opacity-40 cursor-pointer flex items-center gap-1 backdrop-blur-md">
+                  <mat-icon class="text-sm">add</mat-icon>
+                  Add Goal
+                </button>
+              </div>
+            </div>
+          </section>
+          </div>
+        </div>
+      } @else if (activeTab() === 'diagnostics') {
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
+          <div class="lg:col-span-8 lg:col-start-3 space-y-6">
+            <!-- AI Fiduciary Agent Diagnostic Terminal -->
+          <section class="glass-card rounded-2xl p-6 space-y-6">
+            <div class="space-y-1">
+              <h3 class="text-base font-bold font-display text-white flex items-center gap-2">
+                <mat-icon class="text-cyan-400">psychology</mat-icon>
+                AI Fiduciary Agent Diagnostic
+              </h3>
+              <p class="text-xs text-slate-400">Submit private assets, liabilities, and burn rates for Private Wealth diagnostics</p>
+            </div>
+
+            <!-- Trigger Analysis Button -->
+            <div class="pt-2">
+              <button (click)="generateAIDiagnostic()" [disabled]="isAnalyzing()" class="w-full bg-gradient-to-r from-cyan-400 to-violet-500 hover:from-cyan-300 hover:to-violet-400 text-slate-950 font-bold rounded-xl py-3.5 text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-cyan-500/10 disabled:opacity-50">
+                @if (isAnalyzing()) {
+                  <span class="animate-spin border-2 border-slate-950 border-t-transparent rounded-full h-4 w-4"></span>
+                  Processing Private-Wealth Forecasts...
+                } @else {
+                  <mat-icon class="font-bold">insights</mat-icon>
+                  Generate Private Fiduciary Diagnostic
+                }
+              </button>
+            </div>
+
+            @if (analysisError()) {
+              <div class="bg-rose-500/5 border border-rose-500/20 rounded-xl p-4 text-xs text-rose-400 flex items-start gap-2.5 backdrop-blur-md">
+                <mat-icon class="mt-0.5 shrink-0">warning</mat-icon>
+                <div class="space-y-1">
+                  <span class="font-semibold block">Private Diagnostic Analysis Blocked</span>
+                  <span class="text-[11px] text-slate-400 block">{{ analysisError() }}</span>
+                  <span class="text-[10px] text-slate-500 font-mono block mt-1">Please ensure a valid GEMINI_API_KEY is configured in Settings > Secrets.</span>
+                </div>
+              </div>
+            }
+
+            <!-- Loading Breathing State -->
+            @if (isAnalyzing()) {
+              <div class="bg-white/5 border border-white/10 rounded-xl p-8 text-center space-y-4 backdrop-blur-md">
+                <div class="relative w-16 h-16 mx-auto flex items-center justify-center">
+                  <!-- Outer pulsating ring -->
+                  <div class="absolute inset-0 rounded-full bg-cyan-500/10 border border-cyan-500/20 animate-ping"></div>
+                  <!-- Inner rotating sphere -->
+                  <div class="absolute inset-2 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin"></div>
+                  <mat-icon class="text-cyan-400 scale-125">analytics</mat-icon>
+                </div>
+                <div class="space-y-1">
+                  <span class="text-xs text-white font-semibold block">Calculating Inflation-Adjusted Net Worth</span>
+                  <p class="text-[10px] text-slate-500 max-w-xs mx-auto font-sans leading-relaxed">
+                    Factoring a 6.0% annual inflation vector against target timelines, auditing May-June categorized burn-rates, and synthesizing optimal private-banking wealth paths...
+                  </p>
+                </div>
+              </div>
+            }
+
+            <!-- Fiduciary Assessment Render -->
+            @if (analysisResult() && !isAnalyzing()) {
+              <div class="space-y-6">
+                
+                <!-- Headline Advisory Projections -->
+                <div class="bg-white/5 border border-white/10 rounded-xl p-4 space-y-3 backdrop-blur-md">
+                  <div class="flex items-center gap-2 border-b border-white/10 pb-2">
+                    <mat-icon class="text-cyan-400 text-sm">timeline</mat-icon>
+                    <span class="text-xs font-bold text-white font-display">5-Year Forward-Looking Net Worth Model</span>
+                  </div>
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-[11px] text-left">
+                      <thead>
+                        <tr class="border-b border-white/10 text-slate-400 font-mono">
+                          <th class="py-1.5 font-medium">Year</th>
+                          <th class="py-1.5 font-medium">Assets</th>
+                          <th class="py-1.5 font-medium text-right">Liabilities</th>
+                          <th class="py-1.5 font-medium text-right text-cyan-400">Net Worth</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (year of analysisResult()?.projectionYears; track year.year) {
+                          <tr class="border-b border-white/10 font-mono">
+                            <td class="py-1.5 text-slate-300 font-bold">{{ year.year }}</td>
+                            <td class="py-1.5 text-slate-400">₹{{ year.estimatedAssets | number:'1.0-0' }}</td>
+                            <td class="py-1.5 text-slate-400 text-right">₹{{ year.estimatedLiabilities | number:'1.0-0' }}</td>
+                            <td class="py-1.5 text-cyan-400 font-bold text-right">₹{{ year.netWorth | number:'1.0-0' }}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- Milestone Viability Assessments -->
+                <div class="space-y-3">
+                  <span class="text-[10px] text-slate-500 font-mono block">GOAL VIABILITY MATRIX:</span>
+                  <div class="space-y-3">
+                    @for (item of analysisResult()?.milestoneViability; track $index) {
+                      <div class="bg-white/5 border border-white/10 rounded-xl p-4 space-y-2.5 backdrop-blur-md">
+                        <div class="flex items-center justify-between gap-4">
+                          <span class="text-xs font-bold text-white">{{ item.target }}</span>
+                          <span class="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase" [ngClass]="item.isViable ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'">
+                            {{ item.isViable ? 'Viable' : 'Deficit Shortfall' }}
+                          </span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 border-y border-white/10 py-2 text-[11px] font-mono">
+                          <div>
+                            <span class="text-slate-500 block text-[9px]">INFLATION VALUE</span>
+                            <span class="text-slate-300">₹{{ item.inflationAdjustedCost | number:'1.0-0' }}</span>
+                          </div>
+                          <div class="text-right">
+                            <span class="text-slate-500 block text-[9px]">PROJECTED SHORTFALL</span>
+                            <span [ngClass]="item.shortfall > 0 ? 'text-rose-400 font-bold' : 'text-cyan-400'">
+                              ₹{{ item.shortfall | number:'1.0-0' }}
+                            </span>
+                          </div>
+                        </div>
+                        <p class="text-[10px] text-slate-400 leading-relaxed font-sans">
+                          {{ item.advice }}
+                        </p>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Structured Recommendations -->
+                <div class="space-y-3">
+                  <span class="text-[10px] text-slate-500 font-mono block">FIDUCIARY STRATEGIC ACTIONS:</span>
+                  <div class="space-y-3">
+                    @for (rec of analysisResult()?.recommendations; track $index) {
+                      <div class="bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/10 rounded-xl p-4 space-y-2.5 backdrop-blur-md">
+                        <div class="flex items-center justify-between gap-2">
+                          <span class="text-xs font-bold text-cyan-400 flex items-center gap-1.5">
+                            <mat-icon class="text-xs">bolt</mat-icon>
+                            {{ rec.title }}
+                          </span>
+                          <span class="text-[9px] font-mono text-slate-500 uppercase bg-white/5 px-2 py-0.5 rounded border border-white/10">
+                            IMPACT: {{ rec.impact }}
+                          </span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 font-sans leading-relaxed">
+                          {{ rec.actionPlan }}
+                        </p>
+                        <div class="bg-white/5 p-2 rounded-lg border border-white/10 text-[10px] font-mono text-slate-400 flex justify-between items-center">
+                          <span>Financial Benefit:</span>
+                          <span class="text-cyan-400 font-bold">{{ rec.financialBenefits }}</span>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Inflation Review Narrative -->
+                <div class="bg-cyan-500/5 border border-white/10 rounded-xl p-4 text-[11px] text-cyan-400/90 leading-relaxed font-sans space-y-2 backdrop-blur-md">
+                  <div class="flex items-center gap-1 font-bold font-display text-xs text-white">
+                    <mat-icon class="text-xs text-cyan-400">info_outline</mat-icon>
+                    Fiduciary Inflation Assessment
+                  </div>
+                  <p class="text-[10px] text-slate-400">{{ analysisResult()?.inflationImpactNote }}</p>
+                </div>
+
+              </div>
+            } @else if (!analysisResult() && !isAnalyzing()) {
+              <div class="text-center py-12 text-slate-500 space-y-2 border border-dashed border-white/10 rounded-xl backdrop-blur-md">
+                <mat-icon class="text-slate-700">insights</mat-icon>
+                <p class="text-xs">No analysis has been requested for this session.</p>
+                <p class="text-[10px] text-slate-600 max-w-xs mx-auto">Click "Generate Private Fiduciary Diagnostic" above to trigger Gemini intelligence assessments.</p>
+              </div>
+            }
+
+          </section>
+          </div>
+        </div>
+      } @else if (activeTab() === 'preferences') {
+        
+        <!-- Preferences Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
+          
+          <!-- Left Column: User Profile Module -->
+          <div class="lg:col-span-5 space-y-6">
+            <section class="glass-card rounded-2xl p-6 space-y-6">
+              <div class="space-y-1">
+                <h3 class="text-lg font-bold font-display text-white flex items-center gap-2">
+                  <mat-icon class="text-cyan-400">person</mat-icon>
+                  Fiduciary User Profile
+                </h3>
+                <p class="text-xs text-slate-400">Manage private wealth profile metadata used in AI projection diagnostics</p>
+              </div>
+
+              <!-- Profile Form -->
+              <div class="space-y-4 text-xs">
+                <div class="space-y-1.5">
+                  <label for="pref-name" class="text-slate-400 text-[10px] uppercase font-mono block">Full Name</label>
+                  <div class="relative">
+                    <mat-icon class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 scale-75">badge</mat-icon>
+                    <input id="pref-name"
+                           type="text" 
+                           [value]="profileName()" 
+                           (input)="profileName.set($any($event.target).value)" 
+                           placeholder="Enter your name" 
+                           class="w-full glass-input rounded-xl pl-10 pr-4 py-2.5 text-white focus:outline-none focus:border-cyan-500/50 transition-all" />
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="space-y-1.5">
+                    <label for="pref-age" class="text-slate-400 text-[10px] uppercase font-mono block">Age (Years)</label>
+                    <div class="relative">
+                      <mat-icon class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 scale-75">cake</mat-icon>
+                      <input id="pref-age"
+                             type="number" 
+                             [value]="profileAge() || ''" 
+                             (input)="profileAge.set($any($event.target).value ? +$any($event.target).value : null)" 
+                             placeholder="e.g. 32" 
+                             class="w-full glass-input rounded-xl pl-10 pr-4 py-2.5 text-white focus:outline-none focus:border-cyan-500/50 transition-all font-mono" />
+                    </div>
+                  </div>
+
+                  <div class="space-y-1.5">
+                    <label for="pref-income" class="text-slate-400 text-[10px] uppercase font-mono block">Monthly Income (INR)</label>
+                    <div class="relative">
+                      <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 font-mono font-bold text-xs">₹</span>
+                      <input id="pref-income"
+                             type="number" 
+                             [value]="profileIncome() || ''" 
+                             (input)="profileIncome.set($any($event.target).value ? +$any($event.target).value : null)" 
+                             placeholder="e.g. 180000" 
+                             class="w-full glass-input rounded-xl pl-10 pr-4 py-2.5 text-white focus:outline-none focus:border-cyan-500/50 transition-all font-mono text-cyan-400 font-bold" />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Starting Balances Section -->
+                <div class="border-t border-white/10 pt-4 space-y-3">
+                  <span class="text-[10px] text-cyan-400 font-mono uppercase tracking-wider block font-bold">Customizable Starting Account Balances</span>
+                  <div class="grid grid-cols-3 gap-3 font-mono">
+                    <div class="space-y-1">
+                      <label for="start-bal-cash" class="text-slate-400 text-[9px] uppercase">💵 Cash</label>
+                      <input id="start-bal-cash" 
+                             type="number" 
+                             [value]="startingBalances()['Cash']" 
+                             (input)="updateStartingBalance('Cash', $event)" 
+                             class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none" />
+                    </div>
+                    <div class="space-y-1">
+                      <label for="start-bal-icici" class="text-slate-400 text-[9px] uppercase">🏛️ ICICI</label>
+                      <input id="start-bal-icici" 
+                             type="number" 
+                             [value]="startingBalances()['ICICI']" 
+                             (input)="updateStartingBalance('ICICI', $event)" 
+                             class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none" />
+                    </div>
+                    <div class="space-y-1">
+                      <label for="start-bal-hdfc" class="text-slate-400 text-[9px] uppercase">💳 HDFC Card</label>
+                      <input id="start-bal-hdfc" 
+                             type="number" 
+                             [value]="startingBalances()['HDFC Card']" 
+                             (input)="updateStartingBalance('HDFC Card', $event)" 
+                             class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none" />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Customizable Budgets Section -->
+                <div class="border-t border-white/10 pt-4 space-y-3">
+                  <span class="text-[10px] text-cyan-400 font-mono uppercase tracking-wider block font-bold">Customizable Category Budgets (INR)</span>
+                  <div class="grid grid-cols-2 gap-3">
+                    <div class="space-y-1">
+                      <label for="budget-food" class="text-slate-400 text-[9px] font-mono uppercase">🍜 Food</label>
+                      <input id="budget-food" 
+                             type="number" 
+                             [value]="categoryBudgets()['🍜 Food']" 
+                             (input)="updateCategoryBudget('🍜 Food', $event)" 
+                             class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none font-mono" />
+                    </div>
+                    <div class="space-y-1">
+                      <label for="budget-household" class="text-slate-400 text-[9px] font-mono uppercase">🪑 Household</label>
+                      <input id="budget-household" 
+                             type="number" 
+                             [value]="categoryBudgets()['🪑 Household']" 
+                             (input)="updateCategoryBudget('🪑 Household', $event)" 
+                             class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none font-mono" />
+                    </div>
+                    <div class="space-y-1">
+                      <label for="budget-health" class="text-slate-400 text-[9px] font-mono uppercase">🧘🏼 Health</label>
+                      <input id="budget-health" 
+                             type="number" 
+                             [value]="categoryBudgets()['🧘🏼 Health']" 
+                             (input)="updateCategoryBudget('🧘🏼 Health', $event)" 
+                             class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none font-mono" />
+                    </div>
+                    <div class="space-y-1">
+                      <label for="budget-transport" class="text-slate-400 text-[9px] font-mono uppercase">🚗 Transport</label>
+                      <input id="budget-transport" 
+                             type="number" 
+                             [value]="categoryBudgets()['🚗 Transport']" 
+                             (input)="updateCategoryBudget('🚗 Transport', $event)" 
+                             class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none font-mono" />
+                    </div>
+                    <div class="space-y-1">
+                      <label for="budget-entertainment" class="text-slate-400 text-[9px] font-mono uppercase">🎉 Entertainment</label>
+                      <input id="budget-entertainment" 
+                             type="number" 
+                             [value]="categoryBudgets()['🎉 Entertainment']" 
+                             (input)="updateCategoryBudget('🎉 Entertainment', $event)" 
+                             class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none font-mono" />
+                    </div>
+                    <div class="space-y-1">
+                      <label for="budget-investment" class="text-slate-400 text-[9px] font-mono uppercase">📈 Investment</label>
+                      <input id="budget-investment" 
+                             type="number" 
+                             [value]="categoryBudgets()['📈 Investment']" 
+                             (input)="updateCategoryBudget('📈 Investment', $event)" 
+                             class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none font-mono" />
+                    </div>
+                    <div class="space-y-1">
+                      <label for="budget-education" class="text-slate-400 text-[9px] font-mono uppercase">🎓 Education</label>
+                      <input id="budget-education" 
+                             type="number" 
+                             [value]="categoryBudgets()['🎓 Education']" 
+                             (input)="updateCategoryBudget('🎓 Education', $event)" 
+                             class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none font-mono" />
+                    </div>
+                    <div class="space-y-1">
+                      <label for="budget-gift" class="text-slate-400 text-[9px] font-mono uppercase">🎁 Gift</label>
+                      <input id="budget-gift" 
+                             type="number" 
+                             [value]="categoryBudgets()['🎁 Gift']" 
+                             (input)="updateCategoryBudget('🎁 Gift', $event)" 
+                             class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none font-mono" />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Status Feedback -->
+                @if (saveProfileStatus()) {
+                  <div class="bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[11px] rounded-xl p-3 flex items-center gap-2">
+                    <mat-icon class="text-sm">check_circle_outline</mat-icon>
+                    <span>{{ saveProfileStatus() }}</span>
+                  </div>
+                }
+
+                <button (click)="saveUserProfile()" 
+                        [disabled]="isSavingProfile()" 
+                        class="w-full bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-bold rounded-xl py-3 text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-cyan-400/10 disabled:opacity-50">
+                  @if (isSavingProfile()) {
+                    <span class="animate-spin border-2 border-slate-950 border-t-transparent rounded-full h-3 w-3"></span>
+                    Saving Profile...
+                  } @else {
+                    <mat-icon class="text-sm">save</mat-icon>
+                    Save & Sync Profile
+                  }
+                </button>
+              </div>
+
+              <!-- Context Help Card -->
+              <div class="bg-white/5 border border-white/10 rounded-xl p-4 text-[11px] text-slate-400 leading-relaxed space-y-1">
+                <div class="text-white font-bold flex items-center gap-1">
+                  <mat-icon class="text-xs text-cyan-400">shield</mat-icon>
+                  Secure Wealth Metadata
+                </div>
+                <p>All demographic & cashflow variables entered here remain encrypted and are piped into state engines for computing personalized asset depletion and investment run-rates.</p>
+              </div>
+            </section>
+          </div>
+
+          <!-- Right Column: Custom Categorization Rules -->
+          <div class="lg:col-span-7 space-y-6">
+            <section class="glass-card rounded-2xl p-6 space-y-6">
+              <div class="space-y-1">
+                <h3 class="text-lg font-bold font-display text-white flex items-center gap-2">
+                  <mat-icon class="text-cyan-400">category</mat-icon>
+                  Custom Categorization Rules
+                </h3>
+                <p class="text-xs text-slate-400">Create keyword mapping overrides to automatically categorize banking transactions</p>
+              </div>
+
+              <!-- New Rule form -->
+              <div class="bg-white/5 border border-white/10 rounded-xl p-4 space-y-4 text-xs">
+                <div class="font-bold text-white uppercase tracking-wider font-mono text-[10px] text-cyan-400">Create Keyword Overrides</div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="space-y-1.5">
+                    <label for="pref-rule-kw" class="text-slate-400 text-[10px] uppercase font-mono block">SMS Keyword / Merchant Name</label>
+                    <input id="pref-rule-kw"
+                           type="text" 
+                           [value]="newRuleKeyword()" 
+                           (input)="newRuleKeyword.set($any($event.target).value)" 
+                           placeholder="e.g. Starbucks, Zomato, Rent" 
+                           class="w-full glass-input rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-cyan-500/50 transition-all font-mono" />
+                  </div>
+
+                  <div class="space-y-1.5">
+                    <label for="pref-rule-cat" class="text-slate-400 text-[10px] uppercase font-mono block">Assign Category</label>
+                    <select id="pref-rule-cat"
+                            [value]="newRuleCategory()" 
+                            (change)="newRuleCategory.set($any($event.target).value)" 
+                            class="w-full glass-input rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-cyan-500/50 transition-all">
+                      <option value="🍜 Food">🍜 Food</option>
+                      <option value="🪑 Household">🪑 Household</option>
+                      <option value="🧘🏼 Health">🧘🏼 Health</option>
+                      <option value="🚗 Transport">🚗 Transport</option>
+                      <option value="📈 Investment">📈 Investment</option>
+                      <option value="💼 Income">💼 Income</option>
+                      <option value="🎓 Education">🎓 Education</option>
+                      <option value="🎉 Entertainment">🎉 Entertainment</option>
+                      <option value="🎁 Gift">🎁 Gift</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="flex justify-end pt-1">
+                  <button (click)="addCategorizationRule()" 
+                          [disabled]="isSavingRule() || !newRuleKeyword().trim()" 
+                          class="bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-bold px-5 py-2.5 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 shadow-md shadow-cyan-400/10 disabled:opacity-50">
+                    <mat-icon class="text-sm">playlist_add</mat-icon>
+                    Create Categorization Rule
+                  </button>
+                </div>
+              </div>
+
+              <!-- Rules list -->
+              <div class="space-y-3">
+                <div class="text-[10px] text-slate-400 font-mono uppercase tracking-wider">Active Workspace Rules ({{ rules().length }})</div>
+                
+                @if (rules().length === 0) {
+                  <div class="text-center py-10 border border-dashed border-white/10 rounded-xl text-slate-500 space-y-2">
+                    <mat-icon class="text-slate-600 scale-125">rule</mat-icon>
+                    <p class="text-xs">No transaction categorization rules defined yet.</p>
+                    <p class="text-[10px] text-slate-600">Enter keywords above to map incoming SMS descriptions automatically.</p>
+                  </div>
+                } @else {
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    @for (rule of rules(); track rule.id) {
+                      <div class="bg-white/5 border border-white/10 rounded-xl p-3 flex items-center justify-between gap-4">
+                        <div class="space-y-0.5 min-w-0">
+                          <div class="text-xs font-mono font-bold text-white truncate">{{ rule.keyword }}</div>
+                          <div class="text-[10px] text-slate-400">Maps to: <span class="text-cyan-400 font-mono">{{ rule.category }}</span></div>
+                        </div>
+                        <button (click)="deleteCategorizationRule(rule.id)" 
+                                class="h-8 w-8 rounded-lg bg-white/5 border border-white/10 hover:bg-rose-500/10 hover:border-rose-500/20 text-slate-400 hover:text-rose-400 flex items-center justify-center transition-all cursor-pointer">
+                          <mat-icon class="text-xs scale-75">delete_outline</mat-icon>
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </section>
+          </div>
+
+        </div>
+
+      }
+
+    }
+
+  </main>
+
+  <!-- Receipt Preview Modal Overlay -->
+  @if (receiptPreviewModal()) {
+    <div class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+      <div class="glass-card max-w-lg w-full rounded-2xl border border-white/10 p-6 space-y-4 relative">
+        <button (click)="receiptPreviewModal.set(null)" class="absolute top-4 right-4 h-8 w-8 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-cyan-400 text-slate-400 hover:text-white flex items-center justify-center transition-all cursor-pointer">
+          <mat-icon class="scale-75">close</mat-icon>
+        </button>
+        
+        <h4 class="text-sm font-bold font-display text-white flex items-center gap-2">
+          <mat-icon class="text-cyan-400">photo_camera</mat-icon>
+          Attached Photo Receipt
+        </h4>
+        
+        <div class="rounded-xl overflow-hidden bg-black/40 border border-white/5 aspect-[4/3] flex items-center justify-center">
+          <img [src]="receiptPreviewModal() || ''" class="max-h-full max-w-full object-contain" alt="Receipt preview" referrerpolicy="no-referrer" />
+        </div>
+        
+        <div class="flex justify-end pt-2">
+          <button (click)="receiptPreviewModal.set(null)" class="bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs transition-all cursor-pointer">
+            Close Preview
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

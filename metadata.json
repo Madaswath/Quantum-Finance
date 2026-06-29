@@ -1,0 +1,6 @@
+{
+  "name": "Quantum Finance",
+  "description": "An AI-driven financial super-app with regex SMS parsing, dynamic cash flow analytics, and a fiduciary advisor powered by Gemini.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
