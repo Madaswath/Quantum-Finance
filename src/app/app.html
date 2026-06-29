@@ -196,33 +196,22 @@
 
       <!-- Account Balances Sub-Row -->
       <section class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
-        <div class="glass-card rounded-2xl p-4 flex items-center justify-between border-white/5">
-          <span class="text-xs font-mono tracking-wider text-slate-400 flex items-center gap-2">
-            <mat-icon class="text-emerald-400 scale-95">payments</mat-icon>
-            💵 CASH BALANCE
-          </span>
-          <span [class]="'text-sm font-bold font-mono ' + (cashBalance() >= 0 ? 'text-emerald-400' : 'text-rose-400')">
-            ₹{{ cashBalance() | number:'1.0-0' }}
-          </span>
-        </div>
-        <div class="glass-card rounded-2xl p-4 flex items-center justify-between border-white/5">
-          <span class="text-xs font-mono tracking-wider text-slate-400 flex items-center gap-2">
-            <mat-icon class="text-cyan-400 scale-95">account_balance</mat-icon>
-            🏛️ ICICI BANK
-          </span>
-          <span [class]="'text-sm font-bold font-mono ' + (iciciBalance() >= 0 ? 'text-emerald-400' : 'text-rose-400')">
-            ₹{{ iciciBalance() | number:'1.0-0' }}
-          </span>
-        </div>
-        <div class="glass-card rounded-2xl p-4 flex items-center justify-between border-white/5">
-          <span class="text-xs font-mono tracking-wider text-slate-400 flex items-center gap-2">
-            <mat-icon class="text-rose-400 scale-95">credit_score</mat-icon>
-            💳 HDFC CARD
-          </span>
-          <span [class]="'text-sm font-bold font-mono ' + (hdfcBalance() >= 0 ? 'text-emerald-400' : 'text-rose-400')">
-            ₹{{ hdfcBalance() | number:'1.0-0' }}
-          </span>
-        </div>
+        @for (acc of accountBalances(); track acc.id) {
+          <div class="glass-card rounded-2xl p-4 flex items-center justify-between border-white/5">
+            <span class="text-xs font-mono tracking-wider text-slate-400 flex items-center gap-2">
+              @if (acc.category === 'Cash') { <mat-icon class="text-emerald-400 scale-95">payments</mat-icon> }
+              @else if (acc.category === 'Card') { <mat-icon class="text-rose-400 scale-95">credit_score</mat-icon> }
+              @else if (acc.category === 'Savings') { <mat-icon class="text-cyan-400 scale-95">account_balance</mat-icon> }
+              @else if (acc.category === 'Investments') { <mat-icon class="text-purple-400 scale-95">trending_up</mat-icon> }
+              @else if (acc.category === 'Liabilities') { <mat-icon class="text-orange-400 scale-95">money_off</mat-icon> }
+              @else { <mat-icon class="text-slate-400 scale-95">account_balance_wallet</mat-icon> }
+              <span class="uppercase truncate max-w-[120px]">{{ acc.name }}</span>
+            </span>
+            <span [class]="'text-sm font-bold font-mono ' + (acc.currentBalance >= 0 ? 'text-emerald-400' : 'text-rose-400')">
+              ₹{{ acc.currentBalance | number:'1.0-0' }}
+            </span>
+          </div>
+        }
       </section>
 
       <!-- Primary Layout Division (2 Columns) -->
@@ -246,9 +235,9 @@
               <div class="flex flex-wrap items-center gap-2">
                 <select [ngModel]="filterAccount()" (ngModelChange)="filterAccount.set($event)" class="glass-input rounded-lg text-xs py-1.5 px-3 text-slate-300 focus:outline-none">
                   <option value="All">All Accounts</option>
-                  <option value="Cash">Cash Only</option>
-                  <option value="HDFC Card">HDFC Card</option>
-                  <option value="ICICI">ICICI</option>
+                  @for (acc of accounts(); track acc.id) {
+                    <option [value]="acc.name">{{ acc.name }}</option>
+                  }
                 </select>
 
                 <select [ngModel]="filterCategory()" (ngModelChange)="filterCategory.set($event)" class="glass-input rounded-lg text-xs py-1.5 px-3 text-slate-300 focus:outline-none">
@@ -613,18 +602,18 @@
                       @if (txFlow() === 'Transfer') { Source Account } @else { Institution }
                     </label>
                     <select id="tx-account" [(ngModel)]="txAccount" class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none">
-                      <option value="HDFC Card">HDFC Card</option>
-                      <option value="ICICI">ICICI</option>
-                      <option value="Cash">Cash</option>
+                      @for (acc of accounts(); track acc.id) {
+                        <option [value]="acc.name">{{ acc.name }}</option>
+                      }
                     </select>
                   </div>
                   <div class="space-y-1">
                     @if (txFlow() === 'Transfer') {
                       <label for="tx-transfer-to" class="text-slate-400 text-[10px] uppercase font-mono">Destination Account</label>
                       <select id="tx-transfer-to" [(ngModel)]="txTransferTo" class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none">
-                        <option value="HDFC Card">HDFC Card</option>
-                        <option value="ICICI">ICICI</option>
-                        <option value="Cash">Cash</option>
+                        @for (acc of accounts(); track acc.id) {
+                          <option [value]="acc.name">{{ acc.name }}</option>
+                        }
                       </select>
                     } @else {
                       <label for="tx-category" class="text-slate-400 text-[10px] uppercase font-mono">Category</label>
@@ -969,34 +958,84 @@
                   </div>
                 </div>
 
-                <!-- Starting Balances Section -->
-                <div class="border-t border-white/10 pt-4 space-y-3">
-                  <span class="text-[10px] text-cyan-400 font-mono uppercase tracking-wider block font-bold">Customizable Starting Account Balances</span>
-                  <div class="grid grid-cols-3 gap-3 font-mono">
-                    <div class="space-y-1">
-                      <label for="start-bal-cash" class="text-slate-400 text-[9px] uppercase">💵 Cash</label>
-                      <input id="start-bal-cash" 
-                             type="number" 
-                             [value]="startingBalances()['Cash']" 
-                             (input)="updateStartingBalance('Cash', $event)" 
-                             class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none" />
+                <!-- Customizable Accounts Section -->
+                <div class="border-t border-white/10 pt-4 space-y-4">
+                  <span class="text-[10px] text-cyan-400 font-mono uppercase tracking-wider block font-bold">Customizable Accounts</span>
+                  
+                  <div class="space-y-3">
+                    @for (account of accounts(); track account.id) {
+                      <div class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-3 font-mono">
+                        <div class="flex-1 space-y-0.5">
+                          <div class="text-xs font-bold text-white">{{ account.name }}</div>
+                          <div class="text-[9px] text-slate-400 uppercase">{{ account.category }} • {{ account.type }}</div>
+                        </div>
+                        <div class="w-24">
+                          <input type="number" 
+                                 [value]="account.startingBalance" 
+                                 (input)="updateAccountBalance(account.id, $event)" 
+                                 class="w-full glass-input rounded-lg p-1.5 text-white text-right text-xs focus:outline-none bg-slate-900/50" />
+                        </div>
+                        <button (click)="removeAccount(account.id)" class="text-rose-400 hover:text-rose-300 p-1 cursor-pointer">
+                          <mat-icon class="scale-75">delete</mat-icon>
+                        </button>
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Add New Account Form -->
+                  <div class="bg-slate-900/40 border border-white/5 rounded-xl p-4 space-y-3 mt-4">
+                    <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">Add New Account</h4>
+                    <div class="grid grid-cols-2 gap-3 font-mono">
+                      <div class="space-y-1">
+                        <label for="new-acc-name" class="text-slate-500 text-[9px] uppercase">Name</label>
+                        <input id="new-acc-name" type="text" [(ngModel)]="newAccountName" placeholder="e.g. SBI Savings" class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none" />
+                      </div>
+                      <div class="space-y-1">
+                        <label for="new-acc-cat" class="text-slate-500 text-[9px] uppercase">Category</label>
+                        <select id="new-acc-cat" [(ngModel)]="newAccountCategory" class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none appearance-none">
+                          <option value="Savings">Savings</option>
+                          <option value="Cash">Cash</option>
+                          <option value="Card">Card</option>
+                          <option value="Investments">Investments</option>
+                          <option value="Liabilities">Liabilities</option>
+                        </select>
+                      </div>
+                      <div class="space-y-1">
+                        <label for="new-acc-type" class="text-slate-500 text-[9px] uppercase">Type</label>
+                        <select id="new-acc-type" [(ngModel)]="newAccountType" class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none appearance-none">
+                          @if (newAccountCategory() === 'Savings') {
+                            <option value="Savings">Savings Account</option>
+                          }
+                          @if (newAccountCategory() === 'Cash') {
+                            <option value="Cash">Physical Cash</option>
+                          }
+                          @if (newAccountCategory() === 'Card') {
+                            <option value="Credit">Credit Card</option>
+                            <option value="Debit">Debit Card</option>
+                          }
+                          @if (newAccountCategory() === 'Investments') {
+                            <option value="RD">Recurring Deposit (RD)</option>
+                            <option value="FD">Fixed Deposit (FD)</option>
+                            <option value="Chit">Chit Fund</option>
+                            <option value="ULIP">ULIP</option>
+                            <option value="Mutual Funds">Mutual Funds</option>
+                          }
+                          @if (newAccountCategory() === 'Liabilities') {
+                            <option value="Personal">Personal Loan</option>
+                            <option value="Car">Car Loan</option>
+                            <option value="Home">Home Loan</option>
+                            <option value="Jewel">Jewel Loan</option>
+                          }
+                        </select>
+                      </div>
+                      <div class="space-y-1">
+                        <label for="new-acc-bal" class="text-slate-500 text-[9px] uppercase">Starting Bal</label>
+                        <input id="new-acc-bal" type="number" [(ngModel)]="newAccountBalance" class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none" />
+                      </div>
                     </div>
-                    <div class="space-y-1">
-                      <label for="start-bal-icici" class="text-slate-400 text-[9px] uppercase">🏛️ ICICI</label>
-                      <input id="start-bal-icici" 
-                             type="number" 
-                             [value]="startingBalances()['ICICI']" 
-                             (input)="updateStartingBalance('ICICI', $event)" 
-                             class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none" />
-                    </div>
-                    <div class="space-y-1">
-                      <label for="start-bal-hdfc" class="text-slate-400 text-[9px] uppercase">💳 HDFC Card</label>
-                      <input id="start-bal-hdfc" 
-                             type="number" 
-                             [value]="startingBalances()['HDFC Card']" 
-                             (input)="updateStartingBalance('HDFC Card', $event)" 
-                             class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none" />
-                    </div>
+                    <button (click)="addAccount()" [disabled]="!newAccountName().trim()" class="w-full mt-2 bg-white/5 hover:bg-white/10 border border-white/10 text-cyan-400 font-semibold rounded-lg py-2 text-[10px] uppercase tracking-wider transition-all cursor-pointer disabled:opacity-50">
+                      Add Account
+                    </button>
                   </div>
                 </div>
 

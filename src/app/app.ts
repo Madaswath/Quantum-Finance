@@ -4,11 +4,21 @@ import {FormsModule} from '@angular/forms';
 import {MatIconModule} from '@angular/material/icon';
 import {DonutChartComponent} from './donut-chart';
 
+export type AccountCategory = 'Savings' | 'Cash' | 'Card' | 'Investments' | 'Liabilities';
+
+export interface Account {
+  id: string;
+  name: string;
+  category: AccountCategory;
+  type: string;
+  startingBalance: number;
+}
+
 export interface Transaction {
   id: string;
   userId: string;
   period: string;
-  accountSource: 'Cash' | 'HDFC Card' | 'ICICI';
+  accountSource: string;
   category: string;
   subcategory: string;
   note: string;
@@ -96,13 +106,13 @@ export class App implements OnInit {
 
   // Manual Transaction Input Fields
   txDate = signal<string>(new Date().toISOString().substring(0, 10));
-  txAccount = signal<'Cash' | 'HDFC Card' | 'ICICI'>('HDFC Card');
+  txAccount = signal<string>('HDFC Card');
   txCategory = signal<string>('🍜 Food');
   txSubcategory = signal<string>('');
   txNote = signal<string>('');
   txAmount = signal<number | null>(null);
   txFlow = signal<'Income' | 'Exp.' | 'Transfer'>('Exp.');
-  txTransferTo = signal<'Cash' | 'HDFC Card' | 'ICICI'>('Cash');
+  txTransferTo = signal<string>('Cash');
   txReceiptImage = signal<string>('');
   receiptPreviewModal = signal<string | null>(null);
   ledgerError = signal<string>('');
@@ -122,12 +132,19 @@ export class App implements OnInit {
     '🎁 Gift': 5000,
   });
 
-  // Customizable Starting Account Balances
+  // Customizable Starting Account Balances (Legacy)
   startingBalances = signal<Record<string, number>>({
     'Cash': 15000,
     'HDFC Card': -8500,
     'ICICI': 125000
   });
+
+  // Dynamic Accounts
+  accounts = signal<Account[]>([
+    { id: '1', name: 'Cash', category: 'Cash', type: 'Cash', startingBalance: 15000 },
+    { id: '2', name: 'ICICI', category: 'Savings', type: 'Savings', startingBalance: 125000 },
+    { id: '3', name: 'HDFC Card', category: 'Card', type: 'Credit', startingBalance: -8500 }
+  ]);
 
   // Bulk SMS Parser State
   smsText = signal<string>('');
@@ -189,55 +206,29 @@ export class App implements OnInit {
   startingLiabilityPool = signal<number>(350000);
 
   // Computed Financial Metrics
-  cashBalance = computed(() => {
-    const start = this.startingBalances()['Cash'] || 0;
-    const incomes = this.transactions()
-      .filter(t => t.flowDirection === 'Income' && t.accountSource === 'Cash')
-      .reduce((sum, t) => sum + t.amount, 0);
-    const expenses = this.transactions()
-      .filter(t => t.flowDirection === 'Exp.' && t.accountSource === 'Cash')
-      .reduce((sum, t) => sum + t.amount, 0);
-    const transfersTo = this.transactions()
-      .filter(t => t.flowDirection === 'Transfer' && t.transferTo === 'Cash')
-      .reduce((sum, t) => sum + t.amount, 0);
-    const transfersFrom = this.transactions()
-      .filter(t => t.flowDirection === 'Transfer' && t.accountSource === 'Cash')
-      .reduce((sum, t) => sum + t.amount, 0);
-    return start + incomes - expenses + transfersTo - transfersFrom;
-  });
-
-  iciciBalance = computed(() => {
-    const start = this.startingBalances()['ICICI'] || 0;
-    const incomes = this.transactions()
-      .filter(t => t.flowDirection === 'Income' && t.accountSource === 'ICICI')
-      .reduce((sum, t) => sum + t.amount, 0);
-    const expenses = this.transactions()
-      .filter(t => t.flowDirection === 'Exp.' && t.accountSource === 'ICICI')
-      .reduce((sum, t) => sum + t.amount, 0);
-    const transfersTo = this.transactions()
-      .filter(t => t.flowDirection === 'Transfer' && t.transferTo === 'ICICI')
-      .reduce((sum, t) => sum + t.amount, 0);
-    const transfersFrom = this.transactions()
-      .filter(t => t.flowDirection === 'Transfer' && t.accountSource === 'ICICI')
-      .reduce((sum, t) => sum + t.amount, 0);
-    return start + incomes - expenses + transfersTo - transfersFrom;
-  });
-
-  hdfcBalance = computed(() => {
-    const start = this.startingBalances()['HDFC Card'] || 0;
-    const incomes = this.transactions()
-      .filter(t => t.flowDirection === 'Income' && t.accountSource === 'HDFC Card')
-      .reduce((sum, t) => sum + t.amount, 0);
-    const expenses = this.transactions()
-      .filter(t => t.flowDirection === 'Exp.' && t.accountSource === 'HDFC Card')
-      .reduce((sum, t) => sum + t.amount, 0);
-    const transfersTo = this.transactions()
-      .filter(t => t.flowDirection === 'Transfer' && t.transferTo === 'HDFC Card')
-      .reduce((sum, t) => sum + t.amount, 0);
-    const transfersFrom = this.transactions()
-      .filter(t => t.flowDirection === 'Transfer' && t.accountSource === 'HDFC Card')
-      .reduce((sum, t) => sum + t.amount, 0);
-    return start + incomes - expenses + transfersTo - transfersFrom;
+  accountBalances = computed(() => {
+    const accs = this.accounts();
+    const txs = this.transactions();
+    
+    return accs.map(acc => {
+      const incomes = txs
+        .filter(t => t.flowDirection === 'Income' && t.accountSource === acc.name)
+        .reduce((sum, t) => sum + t.amount, 0);
+      const expenses = txs
+        .filter(t => t.flowDirection === 'Exp.' && t.accountSource === acc.name)
+        .reduce((sum, t) => sum + t.amount, 0);
+      const transfersTo = txs
+        .filter(t => t.flowDirection === 'Transfer' && t.transferTo === acc.name)
+        .reduce((sum, t) => sum + t.amount, 0);
+      const transfersFrom = txs
+        .filter(t => t.flowDirection === 'Transfer' && t.accountSource === acc.name)
+        .reduce((sum, t) => sum + t.amount, 0);
+        
+      return {
+        ...acc,
+        currentBalance: acc.startingBalance + incomes - expenses + transfersTo - transfersFrom
+      };
+    });
   });
 
   totalIncomes = computed(() => {
@@ -253,14 +244,24 @@ export class App implements OnInit {
   });
 
   calculatedSavingsPool = computed(() => {
-    const activeAssets = Math.max(0, this.cashBalance()) + Math.max(0, this.iciciBalance());
+    // Add all balances from non-liability and non-credit accounts to active assets
+    const activeAssets = this.accountBalances()
+      .filter(a => a.category !== 'Liabilities' && !(a.category === 'Card' && a.type === 'Credit'))
+      .reduce((sum, a) => sum + Math.max(0, a.currentBalance), 0);
     return this.startingSavingsPool() + activeAssets;
   });
 
   calculatedLiabilityPool = computed(() => {
-    const hdfc = this.hdfcBalance();
-    const cardDebt = hdfc < 0 ? -hdfc : 0;
-    return this.startingLiabilityPool() + cardDebt;
+    // Collect all negative balances in all accounts, plus balances of Liabilities accounts
+    const cardDebts = this.accountBalances()
+      .filter(a => a.category === 'Card' && a.type === 'Credit')
+      .reduce((sum, a) => sum + (a.currentBalance < 0 ? -a.currentBalance : 0), 0);
+      
+    const liabilities = this.accountBalances()
+      .filter(a => a.category === 'Liabilities')
+      .reduce((sum, a) => sum + Math.max(0, a.currentBalance), 0); // Assuming liabilities are entered as positive amounts
+
+    return this.startingLiabilityPool() + cardDebts + liabilities;
   });
 
   calculatedNetWorth = computed(() => {
@@ -544,6 +545,19 @@ export class App implements OnInit {
         if (data.startingBalances) {
           this.startingBalances.set(data.startingBalances);
         }
+        if (data.accounts) {
+          this.accounts.set(data.accounts);
+        } else if (data.startingBalances) {
+          // Migrate legacy startingBalances to accounts
+          const mappedAccounts = Object.entries(data.startingBalances).map(([name, bal], i) => ({
+            id: `legacy-${i}`,
+            name,
+            category: 'Cash' as AccountCategory, // default fallback
+            type: 'Legacy',
+            startingBalance: Number(bal)
+          }));
+          this.accounts.set(mappedAccounts);
+        }
       }
     } catch (e) {
       console.error('Failed to load user profile', e);
@@ -569,7 +583,8 @@ export class App implements OnInit {
           income: this.profileIncome(),
           goals: this.milestones(), // keep milestones in sync
           categoryBudgets: this.categoryBudgets(),
-          startingBalances: this.startingBalances()
+          startingBalances: this.startingBalances(),
+          accounts: this.accounts()
         })
       });
       if (res.ok) {
@@ -877,6 +892,36 @@ export class App implements OnInit {
     const val = +(event.target as HTMLInputElement).value || 0;
     this.categoryBudgets.update(b => ({ ...b, [key]: val }));
   }
+
+  // Account Management
+  newAccountName = signal<string>('');
+  newAccountCategory = signal<AccountCategory>('Savings');
+  newAccountType = signal<string>('Savings');
+  newAccountBalance = signal<number>(0);
+
+  addAccount() {
+    if (!this.newAccountName().trim()) return;
+    const account: Account = {
+      id: crypto.randomUUID(),
+      name: this.newAccountName(),
+      category: this.newAccountCategory(),
+      type: this.newAccountType(),
+      startingBalance: this.newAccountBalance()
+    };
+    this.accounts.update(accs => [...accs, account]);
+    this.newAccountName.set('');
+    this.newAccountBalance.set(0);
+  }
+
+  removeAccount(id: string) {
+    this.accounts.update(accs => accs.filter(a => a.id !== id));
+  }
+
+  updateAccountBalance(id: string, event: Event) {
+    const val = +(event.target as HTMLInputElement).value || 0;
+    this.accounts.update(accs => accs.map(a => a.id === id ? { ...a, startingBalance: val } : a));
+  }
+
 
   exportFilteredToCSV() {
     const list = this.filteredTransactions();

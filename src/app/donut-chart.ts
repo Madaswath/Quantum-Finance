@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-inferrable-types, @typescript-eslint/no-unused-vars */
 import { Component, ElementRef, Input, OnChanges, OnInit, ViewChild, HostListener } from '@angular/core';
 import * as d3 from 'd3';
 
