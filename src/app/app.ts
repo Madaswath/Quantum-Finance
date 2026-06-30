@@ -337,7 +337,7 @@ export class App implements OnInit {
 
   taxCalculation = computed(() => {
     const income = (this.profileIncome() || 0) * 12;
-    const regime = this.taxRegime();
+    // taxRegime is read but handled implicitly by the returns below
     const ded80C = Math.min(150000, this.investment80C());
     const dedNPS = Math.min(50000, this.npsContribution());
     const ded80D = Math.min(25000, this.healthInsurance80D());
