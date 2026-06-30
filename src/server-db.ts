@@ -53,7 +53,7 @@ export interface UserProfile {
   }[];
   categoryBudgets?: Record<string, number>;
   startingBalances?: Record<string, number>;
-  accounts?: any[];
+  accounts?: { id: string; name: string; category: string; type: string; startingBalance: number; }[];
   isPremium?: boolean;
   createdAt: string;
 }

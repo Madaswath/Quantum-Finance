@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+import os
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import auth, transactions, advisor
 
@@ -9,9 +10,14 @@ app = FastAPI(
 )
 
 # CORS configuration for seamless client integrations
+frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+allowed_origins = [frontend_url]
+if os.getenv("ENVIRONMENT") == "development":
+    allowed_origins.append("http://localhost:4200") # Angular default
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

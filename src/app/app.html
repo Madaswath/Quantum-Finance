@@ -1182,10 +1182,10 @@
                     </div>
 
                     <div class="space-y-1.5">
-                      <label class="text-slate-400 text-[10px] uppercase font-mono block">Post-Retirement Monthly Expenses (Today's value)</label>
+                      <label for="post-retire-exp" class="text-slate-400 text-[10px] uppercase font-mono block">Post-Retirement Monthly Expenses (Today's value)</label>
                       <div class="relative">
                         <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 font-mono text-xs">₹</span>
-                        <input type="number" [ngModel]="postRetirementMonthlyExp()" (ngModelChange)="postRetirementMonthlyExp.set(+$event)" class="w-full glass-input rounded-xl pl-8 pr-4 py-2 text-white font-mono" />
+                        <input id="post-retire-exp" type="number" [ngModel]="postRetirementMonthlyExp()" (ngModelChange)="postRetirementMonthlyExp.set(+$event)" class="w-full glass-input rounded-xl pl-8 pr-4 py-2 text-white font-mono" />
                       </div>
                     </div>
                   </div>
@@ -1193,12 +1193,12 @@
                   <div class="space-y-4">
                     <div class="grid grid-cols-2 gap-3">
                       <div class="space-y-1">
-                        <label class="text-slate-400 text-[10px] uppercase font-mono block">Inflation Index (%)</label>
-                        <input type="number" step="0.01" [ngModel]="expectedInflationRate()" (ngModelChange)="expectedInflationRate.set(+$event)" class="w-full glass-input rounded-xl p-2 text-white font-mono" />
+                        <label for="inflation-idx" class="text-slate-400 text-[10px] uppercase font-mono block">Inflation Index (%)</label>
+                        <input id="inflation-idx" type="number" step="0.01" [ngModel]="expectedInflationRate()" (ngModelChange)="expectedInflationRate.set(+$event)" class="w-full glass-input rounded-xl p-2 text-white font-mono" />
                       </div>
                       <div class="space-y-1">
-                        <label class="text-slate-400 text-[10px] uppercase font-mono block">Annuity Return (%)</label>
-                        <input type="number" step="0.01" [ngModel]="postRetirementReturnRate()" (ngModelChange)="postRetirementReturnRate.set(+$event)" class="w-full glass-input rounded-xl p-2 text-white font-mono" />
+                        <label for="annuity-ret" class="text-slate-400 text-[10px] uppercase font-mono block">Annuity Return (%)</label>
+                        <input id="annuity-ret" type="number" step="0.01" [ngModel]="postRetirementReturnRate()" (ngModelChange)="postRetirementReturnRate.set(+$event)" class="w-full glass-input rounded-xl p-2 text-white font-mono" />
                       </div>
                     </div>
 
@@ -1686,21 +1686,21 @@
         
         <div class="space-y-3 text-xs">
           <div class="space-y-1">
-            <label class="text-slate-400 text-[9px] uppercase font-mono">Cardholder Name</label>
-            <input type="text" value="Aswath" class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none" />
+            <label for="cc-name" class="text-slate-400 text-[9px] uppercase font-mono">Cardholder Name</label>
+            <input id="cc-name" type="text" value="Aswath" class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none" />
           </div>
           <div class="space-y-1">
-            <label class="text-slate-400 text-[9px] uppercase font-mono">Card Number</label>
-            <input type="text" value="4111 2222 3333 4444" class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none font-mono" />
+            <label for="cc-num" class="text-slate-400 text-[9px] uppercase font-mono">Card Number</label>
+            <input id="cc-num" type="text" value="4111 2222 3333 4444" class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none font-mono" />
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div class="space-y-1">
-              <label class="text-slate-400 text-[9px] uppercase font-mono">Expiration</label>
-              <input type="text" value="12/28" class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none font-mono" />
+              <label for="cc-exp" class="text-slate-400 text-[9px] uppercase font-mono">Expiration</label>
+              <input id="cc-exp" type="text" value="12/28" class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none font-mono" />
             </div>
             <div class="space-y-1">
-              <label class="text-slate-400 text-[9px] uppercase font-mono">CVV</label>
-              <input type="text" value="999" class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none font-mono" />
+              <label for="cc-cvv" class="text-slate-400 text-[9px] uppercase font-mono">CVV</label>
+              <input id="cc-cvv" type="text" value="999" class="w-full glass-input rounded-lg p-2 text-white text-xs focus:outline-none font-mono" />
             </div>
           </div>
         </div>

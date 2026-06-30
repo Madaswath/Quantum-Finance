@@ -11,8 +11,20 @@ services:
       - DATABASE_URL=postgresql+asyncpg://postgres:app_production_pass@fintech-db:5432/quantum_wealth
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY:-super_quantum_secure_secret_key_2026}
+      - FRONTEND_URL=http://localhost:4000
     depends_on:
       - fintech-db
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "4000:4000"
+    environment:
+      - BACKEND_URL=http://localhost:8000
+    depends_on:
+      - backend-api
 
   fintech-db:
     image: ankane/pgvector:latest  # Extends PostgreSQL with pre-compiled pgvector dependencies
