@@ -13,6 +13,13 @@ async def generate_fiduciary_diagnostic(
     payload: AdvisorRequest,
     current_user: User = Depends(get_current_user)
 ):
+    # Gate access to premium members only
+    if not current_user.profile or not current_user.profile.is_premium:
+        raise HTTPException(
+            status_code=403, 
+            detail="Premium subscription required to access AI Fiduciary Advisor insights."
+        )
+        
     try:
         raw_result = await diagnostic_engine.run_financial_diagnostic(
             net_worth_matrix=payload.net_worth_matrix.model_dump(),

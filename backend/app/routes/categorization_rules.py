@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -16,7 +17,7 @@ async def list_rules(
 ):
     result = await db.execute(
         select(CategorizationRule)
-        .filter(CategorizationRule.user_id == current_user.id)
+        .filter(CategorizationRule.user_id == current_user.id, CategorizationRule.is_deleted == False)
         .order_by(CategorizationRule.created_at.desc())
     )
     return result.scalars().all()
@@ -30,7 +31,11 @@ async def create_rule(
     # Check if keyword already exists for this user
     result = await db.execute(
         select(CategorizationRule)
-        .filter(CategorizationRule.user_id == current_user.id, CategorizationRule.keyword == rule_data.keyword)
+        .filter(
+            CategorizationRule.user_id == current_user.id, 
+            CategorizationRule.keyword == rule_data.keyword,
+            CategorizationRule.is_deleted == False
+        )
     )
     existing_rule = result.scalars().first()
     if existing_rule:
@@ -58,12 +63,17 @@ async def delete_rule(
 ):
     result = await db.execute(
         select(CategorizationRule)
-        .filter(CategorizationRule.id == rule_id, CategorizationRule.user_id == current_user.id)
+        .filter(
+            CategorizationRule.id == rule_id, 
+            CategorizationRule.user_id == current_user.id,
+            CategorizationRule.is_deleted == False
+        )
     )
     rule = result.scalars().first()
     if not rule:
         raise HTTPException(status_code=404, detail="Categorization rule not found")
 
-    await db.delete(rule)
+    rule.is_deleted = True
+    rule.deleted_at = datetime.utcnow()
     await db.commit()
     return

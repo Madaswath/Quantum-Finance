@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from datetime import datetime
 from typing import Optional, List, Literal
 from decimal import Decimal
@@ -11,8 +11,20 @@ class UserCreate(BaseModel):
 
 class UserResponse(BaseModel):
     id: UUID
-    email: EmailStr
+    email: str
     created_at: datetime
+
+    @field_validator("email")
+    @classmethod
+    def mask_email_field(cls, v: str) -> str:
+        if "@" in v:
+            name, domain = v.split("@", 1)
+            if len(name) <= 2:
+                masked = name[0] + "*" * len(name)
+            else:
+                masked = name[0] + "*" * (len(name) - 2) + name[-1]
+            return f"{masked}@{domain}"
+        return v
 
     class Config:
         from_attributes = True
@@ -37,6 +49,7 @@ class TransactionBase(BaseModel):
     note: Optional[str] = None
     amount: Decimal = Field(..., max_digits=12, decimal_places=2)
     flow_direction: Literal["Income", "Exp."]
+    transaction_type: Optional[str] = None
 
 class TransactionCreate(TransactionBase):
     pass
@@ -70,6 +83,13 @@ class MilestoneSchema(BaseModel):
     target: str
     amount: Decimal
     timeline: str
+    priority: Optional[float] = 1.0
+    years_left: Optional[float] = 1.0
+    amount_required_today: Optional[Decimal] = Decimal("0.0")
+    amount_available_today: Optional[Decimal] = Decimal("0.0")
+    inflation: Optional[Decimal] = Decimal("0.05")
+    step_up: Optional[Decimal] = Decimal("0.05")
+    sip_required: Optional[Decimal] = Decimal("0.0")
 
 class BurnRateSchema(BaseModel):
     category: str
@@ -128,6 +148,7 @@ class UserProfileUpdate(BaseModel):
     age: Optional[int] = None
     income: Optional[Decimal] = None
     goals: Optional[List[MilestoneSchema]] = None
+    is_premium: Optional[bool] = None
 
 class UserProfileResponse(BaseModel):
     id: UUID
@@ -136,6 +157,7 @@ class UserProfileResponse(BaseModel):
     age: Optional[int] = None
     income: Optional[Decimal] = None
     goals: Optional[List[MilestoneSchema]] = None
+    is_premium: bool = False
     created_at: datetime
 
     class Config:

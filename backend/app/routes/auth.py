@@ -77,6 +77,15 @@ async def login_user(login_data: LoginRequest, response: Response, db: AsyncSess
         samesite="strict",
         max_age=int(refresh_token_expires.total_seconds())
     )
+    # Store access token securely in HTTP-only cookie
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        secure=True,
+        samesite="strict",
+        max_age=int(access_token_expires.total_seconds())
+    )
     
     return TokenResponse(
         access_token=access_token,
@@ -125,6 +134,15 @@ async def google_login(payload: dict, response: Response, db: AsyncSession = Dep
         samesite="strict",
         max_age=int(refresh_token_expires.total_seconds())
     )
+    # Store access token securely in HTTP-only cookie
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        secure=True,
+        samesite="strict",
+        max_age=int(access_token_expires.total_seconds())
+    )
     
     return TokenResponse(
         access_token=access_token,
@@ -133,15 +151,30 @@ async def google_login(payload: dict, response: Response, db: AsyncSession = Dep
     )
 
 
+# Logout Endpoint to clear HttpOnly cookies
+@router.post("/logout")
+async def logout_user(response: Response):
+    response.delete_cookie("access_token", httponly=True, secure=True, samesite="strict")
+    response.delete_cookie("refresh_token", httponly=True, secure=True, samesite="strict")
+    return {"status": "success", "message": "Logged out successfully"}
+
+
 # Dependency to protect routes and extract current user
 async def get_current_user(request: Request, db: AsyncSession = Depends(get_db)) -> User:
-    auth_header = request.headers.get("Authorization")
-    if not auth_header or not auth_header.startswith("Bearer "):
+    # 1. First attempt to fetch token from HTTP-Only cookie
+    token = request.cookies.get("access_token")
+    
+    # 2. Fallback to Authorization header if cookies are not present (for compatibility/development tools)
+    if not token:
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header.split(" ")[1]
+            
+    if not token:
          raise HTTPException(
              status_code=status.HTTP_401_UNAUTHORIZED,
              detail="Authorization token is missing or invalid"
          )
-    token = auth_header.split(" ")[1]
     try:
         payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
         user_id: str = payload.get("sub")

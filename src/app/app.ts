@@ -27,12 +27,20 @@ export interface Transaction {
   transferTo?: 'Cash' | 'HDFC Card' | 'ICICI';
   receiptImage?: string;
   createdAt: string;
+  transactionType?: 'Income' | 'Bills' | 'Expenses' | 'Savings' | 'Investments' | 'Debt Payoff';
 }
 
 export interface Milestone {
   target: string;
   amount: number;
   timeline: string;
+  priority: number;
+  years_left: number;
+  amount_required_today: number;
+  amount_available_today: number;
+  inflation: number;
+  step_up: number;
+  sip_required: number;
 }
 
 export interface Recommendation {
@@ -173,12 +181,70 @@ export class App implements OnInit {
 
   // Milestone Goals
   milestones = signal<Milestone[]>([
-    { target: '🏠 House Down Payment', amount: 2500000, timeline: 'Dec 2028' },
-    { target: '📈 Wealth Compound Goal', amount: 5000000, timeline: 'June 2030' }
+    { 
+      target: '🏠 House Down Payment', 
+      amount: 2500000, 
+      timeline: 'Dec 2028',
+      priority: 5.0,
+      years_left: 5.0,
+      amount_required_today: 2500000,
+      amount_available_today: 250000,
+      inflation: 0.07,
+      step_up: 0.1,
+      sip_required: 15000
+    },
+    { 
+      target: '📈 Wealth Compound Goal', 
+      amount: 5000000, 
+      timeline: 'June 2030',
+      priority: 6.0,
+      years_left: 20.0,
+      amount_required_today: 5000000,
+      amount_available_today: 450000,
+      inflation: 0.05,
+      step_up: 0.1,
+      sip_required: 10000
+    }
   ]);
   newMilestoneTarget = signal<string>('');
   newMilestoneAmount = signal<number | null>(null);
   newMilestoneTimeline = signal<string>('');
+  newMilestonePriority = signal<number>(1.0);
+  newMilestoneYears = signal<number>(1.0);
+  newMilestoneRequiredToday = signal<number | null>(null);
+  newMilestoneAvailableToday = signal<number | null>(null);
+  newMilestoneInflation = signal<number>(0.05);
+  newMilestoneStepUp = signal<number>(0.05);
+  newMilestoneSip = signal<number | null>(null);
+
+  isPremium = signal<boolean>(false);
+  showCheckoutModal = signal<boolean>(false);
+  
+  activeAccountTab = signal<'All' | AccountCategory>('All');
+
+  // FIRE Simulator Inputs
+  retirementAge = signal<number>(55);
+  lifeExpectancy = signal<number>(85);
+  postRetirementMonthlyExp = signal<number>(80000);
+  expectedInflationRate = signal<number>(0.06);
+  postRetirementReturnRate = signal<number>(0.08);
+
+  // Tax regime inputs
+  taxRegime = signal<'New' | 'Old'>('New');
+  investment80C = signal<number>(150000);
+  npsContribution = signal<number>(50000);
+  healthInsurance80D = signal<number>(25000);
+  
+  txType = signal<'Income' | 'Bills' | 'Expenses' | 'Savings' | 'Investments' | 'Debt Payoff'>('Expenses');
+
+  categoriesByType: Record<string, string[]> = {
+    'Bills': ['Rent', 'Electricity', 'Internet', 'Gas Cylinder', 'Insurance', 'Subscriptions', 'Water Bill', 'Phone'],
+    'Expenses': ['Groceries', 'Transportation', 'Dairy Products', 'Petrol', 'Shopping', 'Home Repairs', 'Car/Bike Maintenance', 'Healthcare', 'Entertainment', 'Gym Membership', 'Household Items'],
+    'Savings': ['House', 'Emergency Fund', 'Travel'],
+    'Investments': ['Real Estate', 'Gold', 'FD', 'Stock Market', 'Mutual Funds'],
+    'Debt Payoff': ['Home Loan', 'Credit Card', 'EMI'],
+    'Income': ['Salary', 'Rent Income', 'Business Income', 'Freelance Income', 'FD Interest', 'Side Hustle']
+  };
 
   // Active View Tab
   activeTab = signal<'ledger' | 'goals' | 'diagnostics' | 'preferences'>('ledger');
@@ -229,6 +295,116 @@ export class App implements OnInit {
         currentBalance: acc.startingBalance + incomes - expenses + transfersTo - transfersFrom
       };
     });
+  });
+
+  filteredAccountBalances = computed(() => {
+    const list = this.accountBalances();
+    const tab = this.activeAccountTab();
+    if (tab === 'All') return list;
+    return list.filter(a => a.category === tab);
+  });
+
+  fireTargetCorpus = computed(() => {
+    const currentAge = this.profileAge() || 30;
+    const retAge = this.retirementAge();
+    const lifeExp = this.lifeExpectancy();
+    const monthlyExp = this.postRetirementMonthlyExp();
+    const inflation = this.expectedInflationRate();
+    const returnRate = this.postRetirementReturnRate();
+
+    const yearsToRetirement = Math.max(0, retAge - currentAge);
+    const retirementDuration = Math.max(0, lifeExp - retAge);
+
+    const inflationAdjustedMonthlyExp = monthlyExp * Math.pow(1 + inflation, yearsToRetirement);
+    const annualExpAtRetirement = inflationAdjustedMonthlyExp * 12;
+
+    const realReturnRate = ((1 + returnRate) / (1 + inflation)) - 1;
+
+    let targetCorpus = 0;
+    if (realReturnRate === 0) {
+      targetCorpus = annualExpAtRetirement * retirementDuration;
+    } else {
+      targetCorpus = annualExpAtRetirement * ((1 - Math.pow(1 + realReturnRate, -retirementDuration)) / realReturnRate);
+    }
+
+    return {
+      yearsToRetirement,
+      retirementDuration,
+      adjustedMonthlyExpense: inflationAdjustedMonthlyExp,
+      targetCorpus: Math.max(0, targetCorpus)
+    };
+  });
+
+  taxCalculation = computed(() => {
+    const income = (this.profileIncome() || 0) * 12;
+    const regime = this.taxRegime();
+    const ded80C = Math.min(150000, this.investment80C());
+    const dedNPS = Math.min(50000, this.npsContribution());
+    const ded80D = Math.min(25000, this.healthInsurance80D());
+
+    const stdDeductionOld = 50000;
+    const taxableIncomeOld = Math.max(0, income - stdDeductionOld - ded80C - dedNPS - ded80D);
+    
+    let taxOld = 0;
+    if (taxableIncomeOld > 1000000) {
+      taxOld += (taxableIncomeOld - 1000000) * 0.30;
+      taxOld += 500000 * 0.20;
+      taxOld += 250000 * 0.05;
+    } else if (taxableIncomeOld > 500000) {
+      taxOld += (taxableIncomeOld - 500000) * 0.20;
+      taxOld += 250000 * 0.05;
+    } else if (taxableIncomeOld > 250000) {
+      taxOld += (taxableIncomeOld - 250000) * 0.05;
+    }
+    if (taxableIncomeOld <= 500000) {
+      taxOld = 0;
+    }
+    const cessOld = taxOld * 0.04;
+    const totalTaxOld = taxOld + cessOld;
+
+    const stdDeductionNew = 75000;
+    const taxableIncomeNew = Math.max(0, income - stdDeductionNew);
+    
+    let taxNew = 0;
+    if (taxableIncomeNew > 1500000) {
+      taxNew += (taxableIncomeNew - 1500000) * 0.30;
+      taxNew += 300000 * 0.20;
+      taxNew += 200000 * 0.15;
+      taxNew += 300000 * 0.10;
+      taxNew += 400000 * 0.05;
+    } else if (taxableIncomeNew > 1200000) {
+      taxNew += (taxableIncomeNew - 1200000) * 0.20;
+      taxNew += 200000 * 0.15;
+      taxNew += 300000 * 0.10;
+      taxNew += 400000 * 0.05;
+    } else if (taxableIncomeNew > 1000000) {
+      taxNew += (taxableIncomeNew - 1000000) * 0.15;
+      taxNew += 300000 * 0.10;
+      taxNew += 400000 * 0.05;
+    } else if (taxableIncomeNew > 700000) {
+      taxNew += (taxableIncomeNew - 700000) * 0.10;
+      taxNew += 400000 * 0.05;
+    } else if (taxableIncomeNew > 300000) {
+      taxNew += (taxableIncomeNew - 300000) * 0.05;
+    }
+    if (taxableIncomeNew <= 700000) {
+      taxNew = 0;
+    }
+    const cessNew = taxNew * 0.04;
+    const totalTaxNew = taxNew + cessNew;
+
+    const difference = Math.abs(totalTaxOld - totalTaxNew);
+    const recommendedRegime = totalTaxNew < totalTaxOld ? 'New Regime' : 'Old Regime';
+    
+    return {
+      annualIncome: income,
+      taxableIncomeOld,
+      taxableIncomeNew,
+      totalTaxOld,
+      totalTaxNew,
+      difference,
+      recommendedRegime
+    };
   });
 
   totalIncomes = computed(() => {
@@ -386,6 +562,122 @@ export class App implements OnInit {
     }));
   });
 
+  totalSIPAllocations = computed(() => {
+    let domestic = 0;
+    let us = 0;
+    let debt = 0;
+    let gold = 0;
+    let crypto = 0;
+    let re = 0;
+    let totalSip = 0;
+    
+    for (const goal of this.milestones()) {
+      const alloc = this.getSIPAllocations(goal);
+      domestic += alloc.domesticEquity;
+      us += alloc.usEquity;
+      debt += alloc.debt;
+      gold += alloc.gold;
+      crypto += alloc.crypto;
+      re += alloc.realEstate;
+      totalSip += goal.sip_required || 0;
+    }
+    
+    return {
+      domestic,
+      us,
+      debt,
+      gold,
+      crypto,
+      re,
+      totalSip
+    };
+  });
+
+  selectTxType(type: 'Income' | 'Bills' | 'Expenses' | 'Savings' | 'Investments' | 'Debt Payoff') {
+    this.txType.set(type);
+    if (type === 'Income') {
+      this.txFlow.set('Income');
+    } else {
+      this.txFlow.set('Exp.');
+    }
+    const cats = this.categoriesByType[type];
+    if (cats && cats.length > 0) {
+      this.txCategory.set(cats[0]);
+    }
+  }
+
+  getGoalType(years: number): 'Short Term' | 'Medium Term' | 'Long Term' {
+    if (years < 3) return 'Short Term';
+    if (years <= 6) return 'Medium Term';
+    return 'Long Term';
+  }
+
+  getExpectedReturn(years: number): number {
+    const type = this.getGoalType(years);
+    if (type === 'Short Term') return 0.07;
+    if (type === 'Medium Term') return 0.09;
+    return 0.12;
+  }
+
+  calculateFutureCost(goal: Milestone): number {
+    const rate = this.getExpectedReturn(goal.years_left);
+    const futureReq = (goal.amount_required_today || 0) * Math.pow(1 + (goal.inflation || 0.05), goal.years_left || 1);
+    const futureAvail = (goal.amount_available_today || 0) * Math.pow(1 + rate, goal.years_left || 1);
+    return Math.max(0, futureReq - futureAvail);
+  }
+
+  getSIPAllocations(goal: Milestone) {
+    const type = this.getGoalType(goal.years_left);
+    const sip = goal.sip_required || 0;
+    if (type === 'Short Term') {
+      return {
+        domesticEquity: sip * 0.1,
+        usEquity: sip * 0.0,
+        debt: sip * 0.7,
+        gold: sip * 0.1,
+        crypto: sip * 0.0,
+        realEstate: sip * 0.1
+      };
+    } else if (type === 'Medium Term') {
+      return {
+        domesticEquity: sip * 0.4,
+        usEquity: sip * 0.1,
+        debt: sip * 0.4,
+        gold: sip * 0.05,
+        crypto: sip * 0.0,
+        realEstate: sip * 0.05
+      };
+    } else { // Long Term
+      return {
+        domesticEquity: sip * 0.5,
+        usEquity: sip * 0.15,
+        debt: sip * 0.2,
+        gold: sip * 0.05,
+        crypto: sip * 0.05,
+        realEstate: sip * 0.05
+      };
+    }
+  }
+
+  togglePremiumMembership() {
+    this.isPremium.update(val => !val);
+    this.saveUserProfile();
+  }
+
+  openCheckout() {
+    this.showCheckoutModal.set(true);
+  }
+
+  closeCheckout() {
+    this.showCheckoutModal.set(false);
+  }
+
+  confirmPremiumUpgrade() {
+    this.isPremium.set(true);
+    this.showCheckoutModal.set(false);
+    this.saveUserProfile();
+  }
+
   ngOnInit() {
     this.autoSignInDemo();
   }
@@ -483,7 +775,12 @@ export class App implements OnInit {
   }
 
   // Handle Logout
-  handleLogout() {
+  async handleLogout() {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (e) {
+      console.error('Logout error on backend:', e);
+    }
     this.user.set(null);
     this.token.set(null);
     this.transactions.set([]);
@@ -534,6 +831,7 @@ export class App implements OnInit {
         this.profileName.set(data.name || '');
         this.profileAge.set(data.age || null);
         this.profileIncome.set(data.income || null);
+        this.isPremium.set(data.isPremium || false);
         
         // If profile has goals, load them to milestones signal
         if (data.goals && Array.isArray(data.goals) && data.goals.length > 0) {
@@ -584,7 +882,8 @@ export class App implements OnInit {
           goals: this.milestones(), // keep milestones in sync
           categoryBudgets: this.categoryBudgets(),
           startingBalances: this.startingBalances(),
-          accounts: this.accounts()
+          accounts: this.accounts(),
+          isPremium: this.isPremium()
         })
       });
       if (res.ok) {
@@ -694,7 +993,8 @@ export class App implements OnInit {
           amount: amount,
           flowDirection: this.txFlow(),
           transferTo: isTransfer ? this.txTransferTo() : undefined,
-          receiptImage: this.txReceiptImage() || undefined
+          receiptImage: this.txReceiptImage() || undefined,
+          transactionType: isTransfer ? undefined : this.txType()
         })
       });
       if (res.ok) {
@@ -788,15 +1088,45 @@ export class App implements OnInit {
   // Add and Delete Milestones
   addMilestone() {
     const target = this.newMilestoneTarget().trim();
-    const amount = this.newMilestoneAmount();
+    const amount = this.newMilestoneAmount() || 0;
     const timeline = this.newMilestoneTimeline().trim() || 'Undated';
-    if (!target || !amount || amount <= 0) {
+    if (!target || amount <= 0) {
       return;
     }
-    this.milestones.update(list => [...list, { target, amount, timeline }]);
+    
+    const priority = this.newMilestonePriority();
+    const years_left = this.newMilestoneYears() || 1.0;
+    const amount_required_today = this.newMilestoneRequiredToday() || amount;
+    const amount_available_today = this.newMilestoneAvailableToday() || 0;
+    const inflation = this.newMilestoneInflation();
+    const step_up = this.newMilestoneStepUp();
+    const sip_required = this.newMilestoneSip() || 0;
+
+    const newGoal: Milestone = {
+      target,
+      amount,
+      timeline,
+      priority,
+      years_left,
+      amount_required_today,
+      amount_available_today,
+      inflation,
+      step_up,
+      sip_required
+    };
+
+    this.milestones.update(list => [...list, newGoal]);
+    
     this.newMilestoneTarget.set('');
     this.newMilestoneAmount.set(null);
     this.newMilestoneTimeline.set('');
+    this.newMilestonePriority.set(1.0);
+    this.newMilestoneYears.set(1.0);
+    this.newMilestoneRequiredToday.set(null);
+    this.newMilestoneAvailableToday.set(null);
+    this.newMilestoneInflation.set(0.05);
+    this.newMilestoneStepUp.set(0.05);
+    this.newMilestoneSip.set(null);
     
     // Auto-save milestones back to profile goals in DB
     this.saveUserProfile();
@@ -826,7 +1156,14 @@ export class App implements OnInit {
       milestones: this.milestones().map(m => ({
         target: m.target,
         amount: m.amount,
-        timeline: m.timeline
+        timeline: m.timeline,
+        priority: m.priority || 1.0,
+        years_left: m.years_left || 1.0,
+        amount_required_today: m.amount_required_today || m.amount || 0,
+        amount_available_today: m.amount_available_today || 0,
+        inflation: m.inflation || 0.05,
+        step_up: m.step_up || 0.05,
+        sip_required: m.sip_required || 0
       })),
       burnRates: this.categoryBurnRates().map(b => ({
         category: b.category,

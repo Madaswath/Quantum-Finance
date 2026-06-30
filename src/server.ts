@@ -113,7 +113,7 @@ app.post('/api/transactions', (req: Request, res: Response): void => {
     return;
   }
   try {
-    const {period, accountSource, category, subcategory, note, amount, flowDirection, transferTo, receiptImage} = req.body;
+    const {period, accountSource, category, subcategory, note, amount, flowDirection, transferTo, receiptImage, transactionType} = req.body;
     if (!period || !accountSource || !category || !amount || !flowDirection) {
       res.status(400).json({error: 'Missing required transaction fields'});
       return;
@@ -127,7 +127,8 @@ app.post('/api/transactions', (req: Request, res: Response): void => {
       amount: parseFloat(amount),
       flowDirection,
       transferTo,
-      receiptImage
+      receiptImage,
+      transactionType
     });
     res.status(201).json(tx);
   } catch (error: unknown) {
@@ -193,6 +194,13 @@ app.post('/api/advisor/diagnostic', async (req: Request, res: Response): Promise
   const user = (req as AuthenticatedRequest).user;
   if (!user) {
     res.status(401).json({error: 'Unauthorized'});
+    return;
+  }
+  
+  // Gate access to premium members only
+  const profile = db.getUserProfile(user.id);
+  if (!profile || !profile.isPremium) {
+    res.status(403).json({error: 'Premium subscription required to access AI Fiduciary Advisor insights.'});
     return;
   }
 
@@ -313,14 +321,16 @@ app.put('/api/user-profile', (req: Request, res: Response): void => {
     res.status(401).json({error: 'Unauthorized'});
     return;
   }
-  const {name, age, income, goals, categoryBudgets, startingBalances} = req.body;
+  const {name, age, income, goals, categoryBudgets, startingBalances, accounts, isPremium} = req.body;
   const profile = db.updateUserProfile(user.id, {
     name,
     age: age ? parseInt(age.toString(), 10) : null,
     income: income ? parseFloat(income.toString()) : null,
     goals,
     categoryBudgets,
-    startingBalances
+    startingBalances,
+    accounts,
+    isPremium
   });
   res.json(profile);
 });

@@ -1,0 +1,263 @@
+{
+  "users": [
+    {
+      "id": "133d34b1-d4ee-41ee-8e4b-d1611e57659f",
+      "email": "madaswath@gmail.com",
+      "passwordHash": "seeded_password_hash_for_demo",
+      "createdAt": "2026-06-30T07:32:57.447Z"
+    }
+  ],
+  "transactions": [
+    {
+      "period": "2026-06-28T06:30:00.000Z",
+      "accountSource": "ICICI",
+      "category": "💼 Income",
+      "subcategory": "Salary",
+      "note": "Quantum Corp June Salary Payout",
+      "amount": 180000,
+      "flowDirection": "Income",
+      "id": "84a77546-4211-4cf2-8dd0-576cb242d27a",
+      "userId": "133d34b1-d4ee-41ee-8e4b-d1611e57659f",
+      "createdAt": "2026-06-30T07:32:57.447Z"
+    },
+    {
+      "period": "2026-06-27T06:30:00.000Z",
+      "accountSource": "HDFC Card",
+      "category": "🍜 Food",
+      "subcategory": "Restaurants",
+      "note": "Chai Kings - Evening snacks & Tea",
+      "amount": 180,
+      "flowDirection": "Exp.",
+      "id": "c5659691-cce4-4361-8124-cd30b2fae826",
+      "userId": "133d34b1-d4ee-41ee-8e4b-d1611e57659f",
+      "createdAt": "2026-06-30T07:32:57.447Z"
+    },
+    {
+      "period": "2026-06-26T06:30:00.000Z",
+      "accountSource": "ICICI",
+      "category": "🪑 Household",
+      "subcategory": "Rent",
+      "note": "Monthly Apartment Rent Payment",
+      "amount": 28000,
+      "flowDirection": "Exp.",
+      "id": "6d40c645-22ab-45f3-bffb-6cb320691aaa",
+      "userId": "133d34b1-d4ee-41ee-8e4b-d1611e57659f",
+      "createdAt": "2026-06-30T07:32:57.448Z"
+    },
+    {
+      "period": "2026-06-25T06:30:00.000Z",
+      "accountSource": "HDFC Card",
+      "category": "🧘🏼 Health",
+      "subcategory": "Hospital",
+      "note": "Apollo Pharmacy - Appa Blood Pressure Machine",
+      "amount": 2200,
+      "flowDirection": "Exp.",
+      "id": "17a92e87-17e6-467c-8392-39732508d50a",
+      "userId": "133d34b1-d4ee-41ee-8e4b-d1611e57659f",
+      "createdAt": "2026-06-30T07:32:57.448Z"
+    },
+    {
+      "period": "2026-06-24T06:30:00.000Z",
+      "accountSource": "Cash",
+      "category": "🍜 Food",
+      "subcategory": "Groceries",
+      "note": "Organic Vegetables & Fresh Milk",
+      "amount": 450,
+      "flowDirection": "Exp.",
+      "id": "626be9dc-455c-4d42-aaee-873ee4b6d36f",
+      "userId": "133d34b1-d4ee-41ee-8e4b-d1611e57659f",
+      "createdAt": "2026-06-30T07:32:57.448Z"
+    },
+    {
+      "period": "2026-06-22T06:30:00.000Z",
+      "accountSource": "ICICI",
+      "category": "📈 Investment",
+      "subcategory": "Mutual Fund SIP",
+      "note": "HDFC Top 100 Index Fund SIP",
+      "amount": 15000,
+      "flowDirection": "Exp.",
+      "id": "a8f3fc65-8232-41c6-a8ca-a32cb8564b76",
+      "userId": "133d34b1-d4ee-41ee-8e4b-d1611e57659f",
+      "createdAt": "2026-06-30T07:32:57.448Z"
+    },
+    {
+      "period": "2026-06-20T06:30:00.000Z",
+      "accountSource": "HDFC Card",
+      "category": "🚗 Transport",
+      "subcategory": "Commute",
+      "note": "Uber Ride to office",
+      "amount": 620,
+      "flowDirection": "Exp.",
+      "id": "10656921-90b2-47de-9ff9-36835dfd11f2",
+      "userId": "133d34b1-d4ee-41ee-8e4b-d1611e57659f",
+      "createdAt": "2026-06-30T07:32:57.448Z"
+    },
+    {
+      "period": "2026-06-18T06:30:00.000Z",
+      "accountSource": "HDFC Card",
+      "category": "🍜 Food",
+      "subcategory": "Snacks",
+      "note": "Swiggy Dinner Delivery",
+      "amount": 890,
+      "flowDirection": "Exp.",
+      "id": "169d361b-d69a-4959-b79d-3a2ad6c32356",
+      "userId": "133d34b1-d4ee-41ee-8e4b-d1611e57659f",
+      "createdAt": "2026-06-30T07:32:57.448Z"
+    },
+    {
+      "period": "2026-06-15T06:30:00.000Z",
+      "accountSource": "ICICI",
+      "category": "🎓 Education",
+      "subcategory": "Courses",
+      "note": "Data Science Certification Course",
+      "amount": 4500,
+      "flowDirection": "Exp.",
+      "id": "acf84474-6a2f-4741-894d-978fb17254ba",
+      "userId": "133d34b1-d4ee-41ee-8e4b-d1611e57659f",
+      "createdAt": "2026-06-30T07:32:57.448Z"
+    },
+    {
+      "period": "2026-06-10T06:30:00.000Z",
+      "accountSource": "Cash",
+      "category": "🍜 Food",
+      "subcategory": "Snacks",
+      "note": "Local Tea Stall Chai and biscuits",
+      "amount": 60,
+      "flowDirection": "Exp.",
+      "id": "e886fc58-1a53-49a6-9165-b775c4d88d44",
+      "userId": "133d34b1-d4ee-41ee-8e4b-d1611e57659f",
+      "createdAt": "2026-06-30T07:32:57.448Z"
+    },
+    {
+      "period": "2026-06-05T06:30:00.000Z",
+      "accountSource": "HDFC Card",
+      "category": "🪑 Household",
+      "subcategory": "Utilities",
+      "note": "Electricity Bill Payment",
+      "amount": 3200,
+      "flowDirection": "Exp.",
+      "id": "8c01f747-b204-453c-a3d9-e9a0d785fc83",
+      "userId": "133d34b1-d4ee-41ee-8e4b-d1611e57659f",
+      "createdAt": "2026-06-30T07:32:57.449Z"
+    },
+    {
+      "period": "2026-05-28T06:30:00.000Z",
+      "accountSource": "ICICI",
+      "category": "💼 Income",
+      "subcategory": "Salary",
+      "note": "Quantum Corp May Salary Payout",
+      "amount": 180000,
+      "flowDirection": "Income",
+      "id": "58580bd0-d9e7-4cb5-b58f-3d948e4b4986",
+      "userId": "133d34b1-d4ee-41ee-8e4b-d1611e57659f",
+      "createdAt": "2026-06-30T07:32:57.449Z"
+    },
+    {
+      "period": "2026-05-20T06:30:00.000Z",
+      "accountSource": "HDFC Card",
+      "category": "🧘🏼 Health",
+      "subcategory": "Doctor",
+      "note": "General physician consultation fee",
+      "amount": 800,
+      "flowDirection": "Exp.",
+      "id": "66080b15-d5de-4283-823d-1e7cd1b6908c",
+      "userId": "133d34b1-d4ee-41ee-8e4b-d1611e57659f",
+      "createdAt": "2026-06-30T07:32:57.449Z"
+    },
+    {
+      "period": "2026-05-15T06:30:00.000Z",
+      "accountSource": "ICICI",
+      "category": "📈 Investment",
+      "subcategory": "Stocks",
+      "note": "Zerodha equity purchase",
+      "amount": 10000,
+      "flowDirection": "Exp.",
+      "id": "ed921c6d-b9b5-49e1-8700-45392648ad2d",
+      "userId": "133d34b1-d4ee-41ee-8e4b-d1611e57659f",
+      "createdAt": "2026-06-30T07:32:57.449Z"
+    }
+  ],
+  "categorizationRules": [],
+  "userProfiles": [
+    {
+      "id": "26dd2217-006c-4c5d-bb35-4957c23cc942",
+      "userId": "133d34b1-d4ee-41ee-8e4b-d1611e57659f",
+      "name": "",
+      "age": null,
+      "income": null,
+      "goals": [
+        {
+          "target": "🏠 House Down Payment",
+          "amount": 2500000,
+          "timeline": "Dec 2028",
+          "priority": 5,
+          "years_left": 5,
+          "amount_required_today": 2500000,
+          "amount_available_today": 250000,
+          "inflation": 0.07,
+          "step_up": 0.1,
+          "sip_required": 15000
+        },
+        {
+          "target": "📈 Wealth Compound Goal",
+          "amount": 5000000,
+          "timeline": "June 2030",
+          "priority": 6,
+          "years_left": 20,
+          "amount_required_today": 5000000,
+          "amount_available_today": 450000,
+          "inflation": 0.05,
+          "step_up": 0.1,
+          "sip_required": 10000
+        }
+      ],
+      "categoryBudgets": {
+        "🍜 Food": 15000,
+        "🪑 Household": 30000,
+        "🧘🏼 Health": 10000,
+        "🚗 Transport": 8000,
+        "🎉 Entertainment": 12000,
+        "📈 Investment": 50000,
+        "🎓 Education": 20000,
+        "🎁 Gift": 5000
+      },
+      "startingBalances": {
+        "Cash": 15000,
+        "HDFC Card": -8500,
+        "ICICI": 125000
+      },
+      "createdAt": "2026-06-30T07:34:38.330Z",
+      "accounts": [
+        {
+          "id": "legacy-0",
+          "name": "Cash",
+          "category": "Cash",
+          "type": "Legacy",
+          "startingBalance": 15000
+        },
+        {
+          "id": "legacy-1",
+          "name": "HDFC Card",
+          "category": "Cash",
+          "type": "Legacy",
+          "startingBalance": -8500
+        },
+        {
+          "id": "legacy-2",
+          "name": "ICICI",
+          "category": "Cash",
+          "type": "Legacy",
+          "startingBalance": 125000
+        },
+        {
+          "id": "39e54caa-d7ed-4468-8857-c4b5afc031eb",
+          "name": "My Savings Account",
+          "category": "Savings",
+          "type": "Savings",
+          "startingBalance": 50000
+        }
+      ],
+      "isPremium": true
+    }
+  ]
+}

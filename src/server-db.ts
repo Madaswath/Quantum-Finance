@@ -21,6 +21,7 @@ export interface Transaction {
   flowDirection: 'Income' | 'Exp.' | 'Transfer';
   transferTo?: 'Cash' | 'HDFC Card' | 'ICICI';
   receiptImage?: string; // base64 or url photo save
+  transactionType?: 'Income' | 'Bills' | 'Expenses' | 'Savings' | 'Investments' | 'Debt Payoff';
   createdAt: string;
 }
 
@@ -38,9 +39,22 @@ export interface UserProfile {
   name: string;
   age: number | null;
   income: number | null;
-  goals: { target: string; amount: number; timeline: string }[];
+  goals: { 
+    target: string; 
+    amount: number; 
+    timeline: string;
+    priority?: number;
+    years_left?: number;
+    amount_required_today?: number;
+    amount_available_today?: number;
+    inflation?: number;
+    step_up?: number;
+    sip_required?: number;
+  }[];
   categoryBudgets?: Record<string, number>;
   startingBalances?: Record<string, number>;
+  accounts?: any[];
+  isPremium?: boolean;
   createdAt: string;
 }
 
@@ -194,6 +208,8 @@ export class LocalDB {
     if (data.goals !== undefined) profile.goals = data.goals;
     if (data.categoryBudgets !== undefined) profile.categoryBudgets = data.categoryBudgets;
     if (data.startingBalances !== undefined) profile.startingBalances = data.startingBalances;
+    if (data.accounts !== undefined) profile.accounts = data.accounts;
+    if (data.isPremium !== undefined) profile.isPremium = data.isPremium;
     this.save();
     return profile;
   }

@@ -14,7 +14,10 @@ async def get_profile(
     db: AsyncSession = Depends(get_db)
 ):
     result = await db.execute(
-        select(UserProfile).filter(UserProfile.user_id == current_user.id)
+        select(UserProfile).filter(
+            UserProfile.user_id == current_user.id,
+            UserProfile.is_deleted == False
+        )
     )
     profile = result.scalars().first()
     
@@ -40,7 +43,10 @@ async def update_profile(
     db: AsyncSession = Depends(get_db)
 ):
     result = await db.execute(
-        select(UserProfile).filter(UserProfile.user_id == current_user.id)
+        select(UserProfile).filter(
+            UserProfile.user_id == current_user.id,
+            UserProfile.is_deleted == False
+        )
     )
     profile = result.scalars().first()
     
@@ -57,6 +63,8 @@ async def update_profile(
     if profile_data.goals is not None:
         # Convert List[MilestoneSchema] to a JSON-compatible list of dicts
         profile.goals = [goal.dict() for goal in profile_data.goals]
+    if profile_data.is_premium is not None:
+        profile.is_premium = profile_data.is_premium
         
     await db.commit()
     await db.refresh(profile)

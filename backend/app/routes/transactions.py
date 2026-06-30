@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -19,7 +20,7 @@ async def list_transactions(
 ):
     result = await db.execute(
         select(Transaction)
-        .filter(Transaction.user_id == current_user.id)
+        .filter(Transaction.user_id == current_user.id, Transaction.is_deleted == False)
         .order_by(Transaction.period.desc())
     )
     return result.scalars().all()
@@ -56,13 +57,18 @@ async def delete_transaction(
     db: AsyncSession = Depends(get_db)
 ):
     result = await db.execute(
-        select(Transaction).filter(Transaction.id == tx_id, Transaction.user_id == current_user.id)
+        select(Transaction).filter(
+            Transaction.id == tx_id, 
+            Transaction.user_id == current_user.id,
+            Transaction.is_deleted == False
+        )
     )
     tx = result.scalars().first()
     if not tx:
         raise HTTPException(status_code=404, detail="Transaction not found")
         
-    await db.delete(tx)
+    tx.is_deleted = True
+    tx.deleted_at = datetime.utcnow()
     await db.commit()
     return
 
@@ -105,7 +111,10 @@ async def parse_sms_string(
     try:
         # Fetch user's custom categorization rules
         result = await db.execute(
-            select(CategorizationRule).filter(CategorizationRule.user_id == current_user.id)
+            select(CategorizationRule).filter(
+                CategorizationRule.user_id == current_user.id,
+                CategorizationRule.is_deleted == False
+            )
         )
         rules = result.scalars().all()
         rules_dict = {rule.keyword: rule.category for rule in rules}
@@ -125,7 +134,11 @@ async def get_burn_rates(
     # Retrieve sum of expenses categorized by category matching May/June Excel
     result = await db.execute(
         select(Transaction.category, func.sum(Transaction.amount).label("total"))
-        .filter(Transaction.user_id == current_user.id, Transaction.flow_direction == "Exp.")
+        .filter(
+            Transaction.user_id == current_user.id, 
+            Transaction.flow_direction == "Exp.",
+            Transaction.is_deleted == False
+        )
         .group_by(Transaction.category)
     )
     
