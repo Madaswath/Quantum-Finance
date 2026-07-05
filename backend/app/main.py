@@ -25,13 +25,15 @@ async def startup_event():
         await conn.run_sync(Base.metadata.create_all)
 
 # Mount Routes
-from app.routes import auth, transactions, advisor, categorization_rules, user_profiles
+from app.routes import auth, transactions, advisor, categorization_rules, user_profiles, wallet, admin
 
 app.include_router(auth.router, prefix="/api")
 app.include_router(transactions.router, prefix="/api")
 app.include_router(advisor.router, prefix="/api")
 app.include_router(categorization_rules.router, prefix="/api")
 app.include_router(user_profiles.router, prefix="/api")
+app.include_router(wallet.router, prefix="/api")
+app.include_router(admin.router, prefix="/api")
 
 @app.get("/")
 def read_root():

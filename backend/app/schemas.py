@@ -149,6 +149,14 @@ class UserProfileUpdate(BaseModel):
     income: Optional[Decimal] = None
     goals: Optional[List[MilestoneSchema]] = None
     is_premium: Optional[bool] = None
+    subscription_tier: Optional[str] = None
+    wallet_balance: Optional[Decimal] = None
+    current_theme: Optional[str] = None
+    layout_density: Optional[str] = None
+    current_language: Optional[str] = None
+    category_budgets: Optional[dict] = None
+    starting_balances: Optional[dict] = None
+    accounts: Optional[List[dict]] = None
 
 class UserProfileResponse(BaseModel):
     id: UUID
@@ -158,8 +166,43 @@ class UserProfileResponse(BaseModel):
     income: Optional[Decimal] = None
     goals: Optional[List[MilestoneSchema]] = None
     is_premium: bool = False
+    subscription_tier: str = "Free"
+    wallet_balance: Decimal = Decimal("0.00")
+    current_theme: str = "cyberpunk-slate"
+    layout_density: str = "cozy"
+    current_language: str = "en"
+    category_budgets: Optional[dict] = None
+    starting_balances: Optional[dict] = None
+    accounts: Optional[List[dict]] = None
     created_at: datetime
 
     class Config:
         from_attributes = True
+
+
+# Wallet Credit Schemas
+class WalletCreditRequest(BaseModel):
+    amount: Decimal = Field(..., gt=0)
+
+
+# Subscription Purchase Schemas
+class SubscriptionPurchaseRequest(BaseModel):
+    tier: Literal["Plus", "Pro"]
+
+
+# Administrative Finance Summary
+class AdminUserSummary(BaseModel):
+    email: str
+    subscription_tier: str
+    wallet_balance: Decimal
+    total_tokens: int
+    total_llm_cost: Decimal
+
+class AdminFinanceResponse(BaseModel):
+    total_revenue: Decimal
+    total_wallet_balance: Decimal
+    total_llm_cost: Decimal
+    total_tokens_used: int
+    users: List[AdminUserSummary]
+
 

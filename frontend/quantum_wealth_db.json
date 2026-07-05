@@ -1,0 +1,182 @@
+{
+  "users": [
+    {
+      "id": "08e436a1-6045-4599-8c94-ce7fbf850b58",
+      "email": "madaswath@gmail.com",
+      "passwordHash": "seeded_password_hash_for_demo",
+      "createdAt": "2026-07-05T06:36:22.618Z"
+    }
+  ],
+  "transactions": [
+    {
+      "period": "2026-06-28T06:30:00.000Z",
+      "accountSource": "ICICI",
+      "category": "💼 Income",
+      "subcategory": "Salary",
+      "note": "Quantum Corp June Salary Payout",
+      "amount": 180000,
+      "flowDirection": "Income",
+      "id": "479b990d-698d-4a9a-bf72-388cd2365f2b",
+      "userId": "08e436a1-6045-4599-8c94-ce7fbf850b58",
+      "createdAt": "2026-07-05T06:36:22.618Z"
+    },
+    {
+      "period": "2026-06-27T06:30:00.000Z",
+      "accountSource": "HDFC Card",
+      "category": "🍜 Food",
+      "subcategory": "Restaurants",
+      "note": "Chai Kings - Evening snacks & Tea",
+      "amount": 180,
+      "flowDirection": "Exp.",
+      "id": "c333c66e-7838-48f8-8d05-2ef907323eb8",
+      "userId": "08e436a1-6045-4599-8c94-ce7fbf850b58",
+      "createdAt": "2026-07-05T06:36:22.618Z"
+    },
+    {
+      "period": "2026-06-26T06:30:00.000Z",
+      "accountSource": "ICICI",
+      "category": "🪑 Household",
+      "subcategory": "Rent",
+      "note": "Monthly Apartment Rent Payment",
+      "amount": 28000,
+      "flowDirection": "Exp.",
+      "id": "0f36d1b1-883c-403d-8503-686ab54a75b6",
+      "userId": "08e436a1-6045-4599-8c94-ce7fbf850b58",
+      "createdAt": "2026-07-05T06:36:22.619Z"
+    },
+    {
+      "period": "2026-06-25T06:30:00.000Z",
+      "accountSource": "HDFC Card",
+      "category": "🧘🏼 Health",
+      "subcategory": "Hospital",
+      "note": "Apollo Pharmacy - Appa Blood Pressure Machine",
+      "amount": 2200,
+      "flowDirection": "Exp.",
+      "id": "f9ec8168-4003-4111-8980-5b8c7716acaa",
+      "userId": "08e436a1-6045-4599-8c94-ce7fbf850b58",
+      "createdAt": "2026-07-05T06:36:22.619Z"
+    },
+    {
+      "period": "2026-06-24T06:30:00.000Z",
+      "accountSource": "Cash",
+      "category": "🍜 Food",
+      "subcategory": "Groceries",
+      "note": "Organic Vegetables & Fresh Milk",
+      "amount": 450,
+      "flowDirection": "Exp.",
+      "id": "ea72dbe6-54e4-40e3-92f9-9572e92cee2e",
+      "userId": "08e436a1-6045-4599-8c94-ce7fbf850b58",
+      "createdAt": "2026-07-05T06:36:22.619Z"
+    },
+    {
+      "period": "2026-06-22T06:30:00.000Z",
+      "accountSource": "ICICI",
+      "category": "📈 Investment",
+      "subcategory": "Mutual Fund SIP",
+      "note": "HDFC Top 100 Index Fund SIP",
+      "amount": 15000,
+      "flowDirection": "Exp.",
+      "id": "1486431e-e18c-46aa-ba64-390ff6fee924",
+      "userId": "08e436a1-6045-4599-8c94-ce7fbf850b58",
+      "createdAt": "2026-07-05T06:36:22.619Z"
+    },
+    {
+      "period": "2026-06-20T06:30:00.000Z",
+      "accountSource": "HDFC Card",
+      "category": "🚗 Transport",
+      "subcategory": "Commute",
+      "note": "Uber Ride to office",
+      "amount": 620,
+      "flowDirection": "Exp.",
+      "id": "326197e1-d91f-4d3c-a855-a453f2d5a86e",
+      "userId": "08e436a1-6045-4599-8c94-ce7fbf850b58",
+      "createdAt": "2026-07-05T06:36:22.619Z"
+    },
+    {
+      "period": "2026-06-18T06:30:00.000Z",
+      "accountSource": "HDFC Card",
+      "category": "🍜 Food",
+      "subcategory": "Snacks",
+      "note": "Swiggy Dinner Delivery",
+      "amount": 890,
+      "flowDirection": "Exp.",
+      "id": "ce274016-e44e-45d2-8d7c-8d7015fe0f9c",
+      "userId": "08e436a1-6045-4599-8c94-ce7fbf850b58",
+      "createdAt": "2026-07-05T06:36:22.619Z"
+    },
+    {
+      "period": "2026-06-15T06:30:00.000Z",
+      "accountSource": "ICICI",
+      "category": "🎓 Education",
+      "subcategory": "Courses",
+      "note": "Data Science Certification Course",
+      "amount": 4500,
+      "flowDirection": "Exp.",
+      "id": "61bab605-2ef5-487d-8e4e-8543a4572500",
+      "userId": "08e436a1-6045-4599-8c94-ce7fbf850b58",
+      "createdAt": "2026-07-05T06:36:22.619Z"
+    },
+    {
+      "period": "2026-06-10T06:30:00.000Z",
+      "accountSource": "Cash",
+      "category": "🍜 Food",
+      "subcategory": "Snacks",
+      "note": "Local Tea Stall Chai and biscuits",
+      "amount": 60,
+      "flowDirection": "Exp.",
+      "id": "52e967d8-6b7a-4cea-86c1-67c54fa66d05",
+      "userId": "08e436a1-6045-4599-8c94-ce7fbf850b58",
+      "createdAt": "2026-07-05T06:36:22.619Z"
+    },
+    {
+      "period": "2026-06-05T06:30:00.000Z",
+      "accountSource": "HDFC Card",
+      "category": "🪑 Household",
+      "subcategory": "Utilities",
+      "note": "Electricity Bill Payment",
+      "amount": 3200,
+      "flowDirection": "Exp.",
+      "id": "d90086cb-7ffe-4375-8b8c-49158e84e7fb",
+      "userId": "08e436a1-6045-4599-8c94-ce7fbf850b58",
+      "createdAt": "2026-07-05T06:36:22.619Z"
+    },
+    {
+      "period": "2026-05-28T06:30:00.000Z",
+      "accountSource": "ICICI",
+      "category": "💼 Income",
+      "subcategory": "Salary",
+      "note": "Quantum Corp May Salary Payout",
+      "amount": 180000,
+      "flowDirection": "Income",
+      "id": "357197b7-8422-40f2-be38-b4b29c262456",
+      "userId": "08e436a1-6045-4599-8c94-ce7fbf850b58",
+      "createdAt": "2026-07-05T06:36:22.619Z"
+    },
+    {
+      "period": "2026-05-20T06:30:00.000Z",
+      "accountSource": "HDFC Card",
+      "category": "🧘🏼 Health",
+      "subcategory": "Doctor",
+      "note": "General physician consultation fee",
+      "amount": 800,
+      "flowDirection": "Exp.",
+      "id": "0069d4ed-4d7e-45eb-a69d-ea6cc4e91f08",
+      "userId": "08e436a1-6045-4599-8c94-ce7fbf850b58",
+      "createdAt": "2026-07-05T06:36:22.619Z"
+    },
+    {
+      "period": "2026-05-15T06:30:00.000Z",
+      "accountSource": "ICICI",
+      "category": "📈 Investment",
+      "subcategory": "Stocks",
+      "note": "Zerodha equity purchase",
+      "amount": 10000,
+      "flowDirection": "Exp.",
+      "id": "c7d00e31-e622-401a-9dcb-6f062936031c",
+      "userId": "08e436a1-6045-4599-8c94-ce7fbf850b58",
+      "createdAt": "2026-07-05T06:36:22.619Z"
+    }
+  ],
+  "categorizationRules": [],
+  "userProfiles": []
+}

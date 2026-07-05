@@ -182,9 +182,9 @@
     {
       "id": "26dd2217-006c-4c5d-bb35-4957c23cc942",
       "userId": "133d34b1-d4ee-41ee-8e4b-d1611e57659f",
-      "name": "",
-      "age": null,
-      "income": null,
+      "name": "Aswath",
+      "age": 32,
+      "income": 180000,
       "goals": [
         {
           "target": "🏠 House Down Payment",
@@ -257,7 +257,7 @@
           "startingBalance": 50000
         }
       ],
-      "isPremium": true
+      "isPremium": false
     }
   ]
 }

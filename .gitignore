@@ -5,10 +5,10 @@
 !.env.example
 
 # Compiled output
-/dist
-/tmp
-/out-tsc
-/bazel-out
+**/dist/
+**/tmp/
+**/out-tsc/
+**/bazel-out/
 
 # Node
 node_modules/
@@ -33,15 +33,24 @@ yarn-error.log
 .history/*
 
 # Miscellaneous
-/.angular/cache
-.sass-cache/
-/connect.lock
-/coverage
-/libpeerconnection.log
-testem.log
-/typings
-__screenshots__/
+**/.angular/
+**/.sass-cache/
+**/connect.lock
+**/coverage/
+**/libpeerconnection.log
+**/testem.log
+**/typings/
+**/__screenshots__/
 
 # System files
 .DS_Store
 Thumbs.db
+
+# Python
+**/venv/
+**/.venv/
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+**/.pytest_cache/
+**/.mypy_cache/

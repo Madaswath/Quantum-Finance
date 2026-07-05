@@ -90,7 +90,24 @@ class FinancialDiagnosticEngine:
             if cleaned_text.startswith("```"):
                 cleaned_text = cleaned_text.replace("```json", "").replace("```", "").strip()
                 
-            return json.loads(cleaned_text)
+            usage_data = {}
+            if response.usage_metadata:
+                usage_data = {
+                    "prompt_tokens": getattr(response.usage_metadata, "prompt_token_count", 0),
+                    "completion_tokens": getattr(response.usage_metadata, "candidates_token_count", 0),
+                    "total_tokens": getattr(response.usage_metadata, "total_token_count", 0)
+                }
+            else:
+                usage_data = {
+                    "prompt_tokens": 0,
+                    "completion_tokens": 0,
+                    "total_tokens": 0
+                }
+
+            return {
+                "result": json.loads(cleaned_text),
+                "usage": usage_data
+            }
             
         except Exception as e:
             return {

@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 from app.database import get_db
-from app.models import User
+from app.models import User, UserProfile
 from app.schemas import UserCreate, UserResponse, LoginRequest, TokenResponse
 from app.config import settings
 
@@ -44,6 +44,16 @@ async def register_user(user_data: UserCreate, db: AsyncSession = Depends(get_db
         hashed_password=hashed_pw
     )
     db.add(new_user)
+    await db.flush() # ensure new_user.id is populated
+    
+    default_profile = UserProfile(
+        user_id=new_user.id,
+        name="",
+        age=None,
+        income=None,
+        goals=[]
+    )
+    db.add(default_profile)
     await db.commit()
     await db.refresh(new_user)
     return new_user

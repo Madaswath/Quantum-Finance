@@ -1,0 +1,309 @@
+/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+body {
+  background-color: #020617;
+  color: #f8fafc;
+  font-family: var(--font-sans);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Frosted Glass Custom Theme classes */
+.mesh-gradient {
+  position: fixed;
+  top: -20%;
+  left: -10%;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.08) 0%, transparent 70%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.mesh-gradient-2 {
+  position: fixed;
+  bottom: -20%;
+  right: -10%;
+  width: 50%;
+  height: 50%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.04) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
+}
+
+.glass-card:hover {
+  border-color: rgba(34, 211, 238, 0.2) !important;
+}
+
+.glass-input {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+.glass-input:focus {
+  border-color: rgba(34, 211, 238, 0.5) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.15) !important;
+}
+
+.glass-row {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.glass-row:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  transform: translateX(4px);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(34, 211, 238, 0.2);
+}
+
+/* Themes Definition */
+.theme-cyberpunk-slate {
+  --bg-app: #020617;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --accent: #22d3ee; /* cyan-400 */
+  --accent-hover: #67e8f9; /* cyan-300 */
+  --accent-rgb: 34, 211, 238;
+  --secondary: #c084fc; /* purple-400 */
+  --secondary-rgb: 192, 132, 252;
+  --card-bg: rgba(255, 255, 255, 0.04);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-text: #f8fafc;
+  --mesh-1: radial-gradient(circle at 10% 20%, rgba(34, 211, 238, 0.06) 0%, transparent 60%);
+  --mesh-2: radial-gradient(circle at 90% 80%, rgba(192, 132, 252, 0.06) 0%, transparent 60%);
+}
+
+.theme-fiduciary-emerald {
+  --bg-app: #021f15;
+  --text-main: #ecfdf5;
+  --text-muted: #a7f3d0;
+  --accent: #10b981; /* emerald-500 */
+  --accent-hover: #34d399; /* emerald-400 */
+  --accent-rgb: 16, 185, 129;
+  --secondary: #14b8a6; /* teal-500 */
+  --secondary-rgb: 20, 184, 166;
+  --card-bg: rgba(255, 255, 255, 0.03);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-text: #ecfdf5;
+  --mesh-1: radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 60%);
+  --mesh-2: radial-gradient(circle at 90% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 60%);
+}
+
+.theme-aurora-purple {
+  --bg-app: #08031a;
+  --text-main: #fcfaff;
+  --text-muted: #e9d5ff;
+  --accent: #d946ef; /* fuchsia-500 */
+  --accent-hover: #f0abfc; /* fuchsia-400 */
+  --accent-rgb: 217, 70, 239;
+  --secondary: #6366f1; /* indigo-500 */
+  --secondary-rgb: 99, 102, 241;
+  --card-bg: rgba(255, 255, 255, 0.03);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-text: #fcfaff;
+  --mesh-1: radial-gradient(circle at 10% 20%, rgba(217, 70, 239, 0.08) 0%, transparent 60%);
+  --mesh-2: radial-gradient(circle at 90% 80%, rgba(99, 102, 241, 0.08) 0%, transparent 60%);
+}
+
+.theme-nordic-light {
+  --bg-app: #f8fafc;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --accent: #2563eb; /* blue-600 */
+  --accent-hover: #1d4ed8; /* blue-700 */
+  --accent-rgb: 37, 99, 235;
+  --secondary: #4f46e5; /* indigo-600 */
+  --secondary-rgb: 79, 70, 229;
+  --card-bg: rgba(15, 23, 42, 0.04);
+  --card-border: rgba(15, 23, 42, 0.08);
+  --card-text: #0f172a;
+  --mesh-1: radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.04) 0%, transparent 60%);
+  --mesh-2: radial-gradient(circle at 90% 80%, rgba(79, 70, 229, 0.04) 0%, transparent 60%);
+}
+
+/* Map CSS variables to layout */
+.theme-cyberpunk-slate, .theme-fiduciary-emerald, .theme-aurora-purple, .theme-nordic-light {
+  background-color: var(--bg-app) !important;
+  color: var(--text-main) !important;
+}
+
+/* Specific class overrides */
+.theme-cyberpunk-slate .mesh-gradient, .theme-fiduciary-emerald .mesh-gradient, .theme-aurora-purple .mesh-gradient, .theme-nordic-light .mesh-gradient {
+  background: var(--mesh-1) !important;
+}
+.theme-cyberpunk-slate .mesh-gradient-2, .theme-fiduciary-emerald .mesh-gradient-2, .theme-aurora-purple .mesh-gradient-2, .theme-nordic-light .mesh-gradient-2 {
+  background: var(--mesh-2) !important;
+}
+
+.theme-cyberpunk-slate .glass-card, .theme-fiduciary-emerald .glass-card, .theme-aurora-purple .glass-card, .theme-nordic-light .glass-card {
+  background: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+  color: var(--card-text) !important;
+}
+.theme-cyberpunk-slate .glass-card:hover, .theme-fiduciary-emerald .glass-card:hover, .theme-aurora-purple .glass-card:hover, .theme-nordic-light .glass-card:hover {
+  border-color: rgba(var(--accent-rgb), 0.25) !important;
+}
+
+/* Override input fields */
+.theme-cyberpunk-slate .glass-input, .theme-fiduciary-emerald .glass-input, .theme-aurora-purple .glass-input, .theme-nordic-light .glass-input {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border-color: var(--card-border) !important;
+  color: var(--card-text) !important;
+}
+.theme-nordic-light .glass-input {
+  background: rgba(15, 23, 42, 0.02) !important;
+  color: #0f172a !important;
+}
+.theme-cyberpunk-slate .glass-input:focus, .theme-fiduciary-emerald .glass-input:focus, .theme-aurora-purple .glass-input:focus, .theme-nordic-light .glass-input:focus {
+  border-color: var(--accent) !important;
+}
+
+/* Text overrides */
+.theme-cyberpunk-slate .text-cyan-400, .theme-fiduciary-emerald .text-cyan-400, .theme-aurora-purple .text-cyan-400, .theme-nordic-light .text-cyan-400 {
+  color: var(--accent) !important;
+}
+.theme-cyberpunk-slate .text-cyan-500, .theme-fiduciary-emerald .text-cyan-500, .theme-aurora-purple .text-cyan-500, .theme-nordic-light .text-cyan-500 {
+  color: var(--accent) !important;
+}
+.theme-cyberpunk-slate .hover\:text-cyan-300:hover, .theme-fiduciary-emerald .hover\:text-cyan-300:hover, .theme-aurora-purple .hover\:text-cyan-300:hover, .theme-nordic-light .hover\:text-cyan-300:hover {
+  color: var(--accent-hover) !important;
+}
+.theme-cyberpunk-slate .bg-cyan-400, .theme-fiduciary-emerald .bg-cyan-400, .theme-aurora-purple .bg-cyan-400, .theme-nordic-light .bg-cyan-400 {
+  background-color: var(--accent) !important;
+}
+.theme-cyberpunk-slate .hover\:bg-cyan-300:hover, .theme-fiduciary-emerald .hover\:bg-cyan-300:hover, .theme-aurora-purple .hover\:bg-cyan-300:hover, .theme-nordic-light .hover\:bg-cyan-300:hover {
+  background-color: var(--accent-hover) !important;
+}
+.theme-cyberpunk-slate .bg-cyan-500\/5, .theme-fiduciary-emerald .bg-cyan-500\/5, .theme-aurora-purple .bg-cyan-500\/5, .theme-nordic-light .bg-cyan-500\/5 {
+  background-color: rgba(var(--accent-rgb), 0.05) !important;
+}
+.theme-cyberpunk-slate .border-cyan-500\/10, .theme-fiduciary-emerald .border-cyan-500\/10, .theme-aurora-purple .border-cyan-500\/10, .theme-nordic-light .border-cyan-500\/10 {
+  border-color: rgba(var(--accent-rgb), 0.1) !important;
+}
+.theme-cyberpunk-slate .border-cyan-500\/20, .theme-fiduciary-emerald .border-cyan-500\/20, .theme-aurora-purple .border-cyan-500\/20, .theme-nordic-light .border-cyan-500\/20 {
+  border-color: rgba(var(--accent-rgb), 0.2) !important;
+}
+.theme-cyberpunk-slate .border-cyan-500\/30, .theme-fiduciary-emerald .border-cyan-500\/30, .theme-aurora-purple .border-cyan-500\/30, .theme-nordic-light .border-cyan-500\/30 {
+  border-color: rgba(var(--accent-rgb), 0.3) !important;
+}
+
+/* Secondary (Purple/Indigo) Overrides */
+.theme-cyberpunk-slate .text-violet-400, .theme-fiduciary-emerald .text-violet-400, .theme-aurora-purple .text-violet-400, .theme-nordic-light .text-violet-400 {
+  color: var(--secondary) !important;
+}
+.theme-cyberpunk-slate .bg-violet-400\/10, .theme-fiduciary-emerald .bg-violet-400\/10, .theme-aurora-purple .bg-violet-400\/10, .theme-nordic-light .bg-violet-400\/10 {
+  background-color: rgba(var(--secondary-rgb), 0.1) !important;
+}
+.theme-cyberpunk-slate .border-violet-500\/20, .theme-fiduciary-emerald .border-violet-500\/20, .theme-aurora-purple .border-violet-500\/20, .theme-nordic-light .border-violet-500\/20 {
+  border-color: rgba(var(--secondary-rgb), 0.2) !important;
+}
+
+/* General Layout tweaks for light theme */
+.theme-nordic-light header {
+  background-color: rgba(241, 245, 249, 0.8) !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
+}
+.theme-nordic-light .text-white, .theme-nordic-light h1, .theme-nordic-light h2, .theme-nordic-light h3, .theme-nordic-light h4 {
+  color: #0f172a !important;
+}
+.theme-nordic-light .text-slate-400, .theme-nordic-light .text-slate-300 {
+  color: #475569 !important;
+}
+.theme-nordic-light .text-slate-500 {
+  color: #64748b !important;
+}
+.theme-nordic-light .bg-white\/5 {
+  background-color: rgba(15, 23, 42, 0.05) !important;
+}
+.theme-nordic-light .border-white\/5, .theme-nordic-light .border-white\/10 {
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+.theme-nordic-light .bg-slate-900\/50, .theme-nordic-light .bg-slate-900\/40 {
+  background-color: rgba(15, 23, 42, 0.03) !important;
+}
+
+/* Compact layout density rules */
+.density-compact .glass-card {
+  padding: 1rem !important; /* reduce padding from 1.5rem (p-6) */
+}
+.density-compact .p-6 {
+  padding: 1rem !important;
+}
+.density-compact .p-8 {
+  padding: 1.25rem !important;
+}
+.density-compact .space-y-6 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0.75rem !important;
+}
+.density-compact .space-y-8 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 1rem !important;
+}
+.density-compact .gap-8 {
+  gap: 1rem !important;
+}
+.density-compact .py-4 {
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+}
+.density-compact .py-3 {
+  padding-top: 0.4rem !important;
+  padding-bottom: 0.4rem !important;
+}
+.density-compact .text-lg {
+  font-size: 0.95rem !important;
+}
+.density-compact .text-xl {
+  font-size: 1.05rem !important;
+}
+.density-compact .text-3xl {
+  font-size: 1.6rem !important;
+}
+.density-compact .h-16 {
+  height: 3.5rem !important;
+}
+.density-compact .p-4 {
+  padding: 0.75rem !important;
+}
+
+

@@ -20,6 +20,9 @@ class User(Base):
     transactions = relationship("Transaction", back_populates="user", cascade="all, delete-orphan")
     categorization_rules = relationship("CategorizationRule", back_populates="user", cascade="all, delete-orphan")
     profile = relationship("UserProfile", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    subscription_payments = relationship("SubscriptionPayment", back_populates="user", cascade="all, delete-orphan")
+    wallet_transactions = relationship("WalletTransaction", back_populates="user", cascade="all, delete-orphan")
+    llm_usages = relationship("LLMUsage", back_populates="user", cascade="all, delete-orphan")
 
 
 class Transaction(Base):
@@ -76,6 +79,16 @@ class UserProfile(Base):
     deleted_at = Column(DateTime(timezone=True), nullable=True)
     is_premium = Column(Boolean, default=False, nullable=False)
 
+    # Enterprise fields
+    subscription_tier = Column(String(50), default="Free", nullable=False)
+    wallet_balance = Column(Numeric(12, 2), default=0.00, nullable=False)
+    current_theme = Column(String(50), default="cyberpunk-slate", nullable=False)
+    layout_density = Column(String(20), default="cozy", nullable=False)
+    current_language = Column(String(10), default="en", nullable=False)
+    category_budgets = Column(JSON, default=dict, nullable=True)
+    starting_balances = Column(JSON, default=dict, nullable=True)
+    accounts = Column(JSON, default=list, nullable=True)
+
     user = relationship("User", back_populates="profile")
 
     @property
@@ -107,4 +120,45 @@ class UserProfile(Base):
             self._income = encrypt_data(str(value))
         else:
             self._income = None
+
+
+class SubscriptionPayment(Base):
+    __tablename__ = "subscription_payments"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    amount = Column(Numeric(12, 2), nullable=False)
+    tier = Column(String(50), nullable=False)
+    status = Column(String(50), default="success", nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    user = relationship("User", back_populates="subscription_payments")
+
+
+class WalletTransaction(Base):
+    __tablename__ = "wallet_transactions"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    amount = Column(Numeric(12, 2), nullable=False) # positive for credit, negative for purchase/debit
+    transaction_type = Column(String(50), nullable=False) # "credit", "debit", "purchase"
+    description = Column(String(255), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    user = relationship("User", back_populates="wallet_transactions")
+
+
+class LLMUsage(Base):
+    __tablename__ = "llm_usages"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    model = Column(String(50), default="gemini-3.5-flash", nullable=False)
+    prompt_tokens = Column(Integer, default=0, nullable=False)
+    completion_tokens = Column(Integer, default=0, nullable=False)
+    total_tokens = Column(Integer, default=0, nullable=False)
+    cost = Column(Numeric(12, 6), default=0.0, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    user = relationship("User", back_populates="llm_usages")
 

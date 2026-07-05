@@ -62,9 +62,25 @@ async def update_profile(
         profile.income = profile_data.income
     if profile_data.goals is not None:
         # Convert List[MilestoneSchema] to a JSON-compatible list of dicts
-        profile.goals = [goal.dict() for goal in profile_data.goals]
+        profile.goals = [goal.model_dump() for goal in profile_data.goals]
     if profile_data.is_premium is not None:
         profile.is_premium = profile_data.is_premium
+    if profile_data.subscription_tier is not None:
+        profile.subscription_tier = profile_data.subscription_tier
+    if profile_data.wallet_balance is not None:
+        profile.wallet_balance = profile_data.wallet_balance
+    if profile_data.current_theme is not None:
+        profile.current_theme = profile_data.current_theme
+    if profile_data.layout_density is not None:
+        profile.layout_density = profile_data.layout_density
+    if profile_data.current_language is not None:
+        profile.current_language = profile_data.current_language
+    if profile_data.category_budgets is not None:
+        profile.category_budgets = profile_data.category_budgets
+    if profile_data.starting_balances is not None:
+        profile.starting_balances = profile_data.starting_balances
+    if profile_data.accounts is not None:
+        profile.accounts = profile_data.accounts
         
     await db.commit()
     await db.refresh(profile)
