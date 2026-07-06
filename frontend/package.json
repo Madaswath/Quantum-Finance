@@ -10,7 +10,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "serve:ssr:app": "node dist/app/server/server.mjs",
-    "build:mobile": "npm run build && npx cap sync"
+    "build:mobile": "npm run build && cd ../mobile && npx cap sync"
   },
   "private": true,
   "dependencies": {
@@ -24,10 +24,6 @@
     "@angular/platform-server": "^21.0.0",
     "@angular/router": "^21.0.0",
     "@angular/ssr": "^21.0.0",
-    "@capacitor/android": "^8.4.1",
-    "@capacitor/cli": "^8.4.1",
-    "@capacitor/core": "^8.4.1",
-    "@capacitor/ios": "^8.4.1",
     "@google/genai": "^2.4.0",
     "d3": "^7.9.0",
     "express": "^5.1.0",

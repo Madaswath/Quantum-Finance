@@ -31,7 +31,7 @@ docker tag qw-backend:latest <YOUR_ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/q
 docker push <YOUR_ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/qw-backend:latest
 
 # Build and Push Frontend
-docker build -t qw-frontend -f Dockerfile.frontend .
+docker build -t qw-frontend ./frontend
 docker tag qw-frontend:latest <YOUR_ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/qw-frontend:latest
 docker push <YOUR_ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/qw-frontend:latest
 ```

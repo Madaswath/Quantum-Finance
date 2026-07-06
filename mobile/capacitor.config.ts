@@ -1,9 +1,9 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.quantumwealth.app',
-  appName: 'Quantum Wealth',
-  webDir: 'dist/app/browser'
+  appId: 'com.budgetbee.app',
+  appName: 'BudgetBee',
+  webDir: '../frontend/dist/app/browser'
 };
 
 export default config;
